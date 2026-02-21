@@ -24,6 +24,15 @@ export * as ArrayUtils from './array/index.js';
 // Object utilities
 export * as ObjectUtils from './object/index.js';
 
+// Asserts utilities
+export * as AssertsUtils from './asserts/index.js';
+
+// Boolean utilities
+export * as BooleanUtils from './boolean/index.js';
+
+// Number utilities
+export * as NumberUtils from './number/index.js';
+
 // String utilities
 export * as StringUtils from './string/index.js';
 
@@ -121,3 +130,57 @@ export {
 	Pipe,
 	Sleep,
 } from './function/index.js';
+
+export {
+	// Asserts utilities
+	// (AssertObject is omitted here — it conflicts with ObjectUtils.AssertObject; use AssertsUtils.AssertObject instead)
+	AssertArray,
+	AssertArray2D,
+	AssertArrayAll,
+	AssertArrayAny,
+	AssertArrayNotEmpty,
+	AssertBoolean,
+	AssertEquals,
+	AssertExtends,
+	AssertFunction,
+	AssertInstanceOf,
+	AssertIsType,
+	AssertNotEquals,
+	AssertNotNull,
+	AssertNull,
+	AssertNumber,
+	AssertObjectHasOwnProperty,
+	AssertObjectHasProperty,
+	AssertObjectPropertyNotNull,
+	AssertPredicate,
+	AssertString,
+	AssertStringMatches,
+	AssertStringNotEmpty,
+	AssertSymbol,
+	SetExceptionClass,
+	SetExceptionMessage,
+	ThrowException,
+	// Error classes
+	AssertionError,
+	BaseError,
+	BufferOverflowError,
+	InvalidArgumentError,
+	NotFoundError,
+	NotSupportedError,
+	ValidationError,
+	ArrayError,
+	BooleanError,
+	ExtendsError,
+	FunctionError,
+	InstanceOfError,
+	NotNullError,
+	NullError,
+	NumberError,
+	NumberRangeError,
+	ObjectError,
+	ObjectPropertyError,
+	PredicateError,
+	StringError,
+	SymbolError,
+	TypeGuardError,
+} from './asserts/index.js';
