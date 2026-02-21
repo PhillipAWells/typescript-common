@@ -1,7 +1,7 @@
 {
 	"name": "@pawells/typescript-common",
 	"displayName": "TypeScript Common Utilities",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Shared TypeScript utility library — array, object, string, time, and enum helpers. ESM-only, no runtime dependencies.",
 	"type": "module",
 	"main": "./build/index.js",
@@ -37,7 +37,19 @@
 		"typescript": "^5.3.3",
 		"vitest": "^4.0.18"
 	},
-	"keywords": [],
+	"keywords": [
+		"typescript",
+		"utilities",
+		"helpers",
+		"array",
+		"object",
+		"string",
+		"enum",
+		"function",
+		"time",
+		"esm",
+		"common"
+	],
 	"author": "Phillip Aaron Wells",
 	"license": "MIT",
 	"repository": {
