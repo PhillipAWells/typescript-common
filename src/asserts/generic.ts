@@ -12,10 +12,12 @@ const MAX_VALUE_DISPLAY_LENGTH = 50;
 export type TConstructorFunction<T = any> = new (...args: any[]) => T;
 
 /**
- * Error thrown when a value is unexpectedly null or undefined.
+ * Error thrown when a nullish assertion fails — the value is not null or undefined
+ * but was expected to be. Used by {@link AssertNull} when the provided value is a
+ * live (non-null) reference.
  *
  * @example
- * throw new NotNullError('Value must not be null or undefined');
+ * throw new NullError('Expected value to be null or undefined');
  */
 export class NullError extends Error {
 	constructor(message?: string) {
@@ -26,10 +28,12 @@ export class NullError extends Error {
 }
 
 /**
- * Error thrown when a value is unexpectedly null or undefined.
+ * Error thrown when a non-null assertion fails — the value is null or undefined
+ * but was expected to be non-nullish. Used by {@link AssertNotNull} when the
+ * provided value is absent.
  *
  * @example
- * throw new NotNullError('Value must not be null or undefined');
+ * throw new NotNullError('Expected a non-null value but received null');
  */
 export class NotNullError extends Error {
 	constructor(message?: string) {

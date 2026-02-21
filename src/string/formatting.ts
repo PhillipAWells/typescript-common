@@ -1,10 +1,17 @@
 import type { TFormatParams, TFormatArgs } from './types';
 
 /**
- * Escapes a string for safe use in HTML.
+ * Escapes a string for safe use in HTML by replacing special characters with
+ * their HTML entity equivalents.
  *
- * @param str The input string.
- * @returns The HTML-escaped string.
+ * @param str - The input string
+ * @returns The HTML-escaped string
+ *
+ * @example
+ * ```typescript
+ * EscapeHTML('<b>Hello & "World"</b>');
+ * // '&lt;b&gt;Hello &amp; &quot;World&quot;&lt;/b&gt;'
+ * ```
  */
 export function EscapeHTML(str: string): string {
 	if (str && typeof str === 'string') {

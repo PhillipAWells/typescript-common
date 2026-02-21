@@ -8,10 +8,21 @@ const CACHE_EVICTION_PERCENTAGE = 0.2; // 20%
 const INITIAL_CACHE_HASH_LENGTH = 16;
 
 /**
- * Creates a cached version of MapObject for improved performance when mapping the same objects repeatedly
+ * Creates a cached version of {@link MapObject} for improved performance
+ * when mapping the same objects repeatedly.
  *
- * @param options Configuration options for the cache
- * @returns A cached version of the map function
+ * Results are cached by hashing the object. Cache entries are evicted in
+ * approximately 20% batches when the limit is reached.
+ *
+ * @template T - The object type being mapped
+ * @param options - Configuration options for cache behaviour
+ * @returns A cached map function `(cursor, mapper, mapperKey?) => Promise<Record<keyof T, unknown>>`
+ *
+ * @example
+ * ```typescript
+ * const cachedMap = MapObjectCached<User>();
+ * const display = await cachedMap(user, (key, value) => String(value));
+ * ```
  */
 export function MapObjectCached<T extends object>(options: ICachedObjectMapOptions = {}): (cursor: T, mapper: TPropertyMapper<T>, mapperKey?: string) => Promise<Record<keyof T, unknown>> {
 	const { maxCacheSize = DEFAULT_MAX_CACHE_SIZE } = options;

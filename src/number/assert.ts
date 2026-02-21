@@ -66,33 +66,33 @@ export type TNumericRangeConstraints = Pick<IAssertNumberArgs, 'gt' | 'gte' | 'l
 export type TNumericTypeConstraints = Pick<IAssertNumberArgs, 'finite' | 'integer'>;
 
 /**
- * Configuration interface for numeric range validation constraints.
+ * Configuration interface for numeric validation constraints.
  *
- * This interface defines the various comparison operators that can be applied
- * when validating numeric ranges. All properties are optional, allowing for
- * flexible range definitions. Multiple constraints can be combined to create
- * complex validation rules (e.g., value must be > 0 AND <= 100).
+ * All properties are optional, allowing for flexible validation rules.
+ * Multiple constraints can be combined — all specified conditions must be
+ * satisfied simultaneously (AND logic).
  *
- * @interface RangeArgs
  * @example
  * ```typescript
  * // Single constraint examples
- * const minOnly: RangeArgs = { gte: 0 };          // >= 0
- * const maxOnly: RangeArgs = { lt: 100 };         // < 100
- * const exactValue: RangeArgs = { eq: 42 };       // === 42
+ * const minOnly: IAssertNumberArgs = { gte: 0 };          // >= 0
+ * const maxOnly: IAssertNumberArgs = { lt: 100 };         // < 100
+ * const exactValue: IAssertNumberArgs = { eq: 42 };       // === 42
  *
  * // Multiple constraint examples
- * const range: RangeArgs = { gte: 0, lte: 100 };  // 0 <= value <= 100
- * const exclusive: RangeArgs = { gt: 0, lt: 1 };  // 0 < value < 1
+ * const range: IAssertNumberArgs = { gte: 0, lte: 100 };  // 0 <= value <= 100
+ * const exclusive: IAssertNumberArgs = { gt: 0, lt: 1 };  // 0 < value < 1
  *
- * // Used with AssertNumberRange
- * AssertNumberRange(50, { gte: 0, lte: 100 }); // ✓ Valid
- * AssertNumberRange(-1, { gte: 0, lte: 100 }); // ✗ Throws
+ * // Used with AssertNumber
+ * AssertNumber(50, { gte: 0, lte: 100 }); // ✓ Valid
+ * AssertNumber(-1, { gte: 0, lte: 100 }); // ✗ Throws
  * ```
  */
 export interface IAssertNumberArgs {
-	finite?: boolean; // Optional flag to assert finite number
-	integer?: boolean; // Optional flag to assert integer type
+	/** When `true`, the value must be finite (not `Infinity` or `-Infinity`) */
+	finite?: boolean;
+	/** When `true`, the value must be an integer (no fractional component) */
+	integer?: boolean;
 
 	/** Value must be greater than this number (exclusive) */
 	gt?: number;

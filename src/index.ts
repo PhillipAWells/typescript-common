@@ -184,3 +184,28 @@ export {
 	SymbolError,
 	TypeGuardError,
 } from './asserts/index.js';
+
+export type {
+	// Shared assertion types
+	IAssertException,
+	TConstraintValue,
+	TComparisonOperator,
+	TValidationResult,
+	TGuard,
+	TValidationPredicate,
+	TArrayTypeGuard,
+	TObjectTypeGuard,
+	TNonNullableGuard,
+	TAssertFunction,
+	TConstructorFunction,
+	// Array assertion types
+	IAssertArrayArgs,
+	IAssertArray2DArgs,
+	TSizeConstraint,
+	TDimensionConstraint,
+	// Number assertion types
+	IAssertNumberArgs,
+	TNumericComparison,
+	TNumericRangeConstraints,
+	TNumericTypeConstraints,
+} from './asserts/index.js';

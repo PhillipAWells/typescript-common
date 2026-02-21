@@ -1,10 +1,16 @@
 /**
  * Chunks an array into smaller arrays of a specified size.
- * @param array The array to split.
- * @param size Size of each chunk.
- * @returns Array of arrays, each of the specified size.
+ *
+ * @template T - The type of array elements
+ * @param array - The array to split
+ * @param size - Size of each chunk (last chunk may be smaller)
+ * @returns Array of arrays, each of the specified size
+ *
  * @example
- * const chunks = ArrayChunk([1, 2, 3, 4, 5], 2); // [[1, 2], [3, 4], [5]]
+ * ```typescript
+ * ArrayChunk([1, 2, 3, 4, 5], 2); // [[1, 2], [3, 4], [5]]
+ * ArrayChunk(['a', 'b', 'c'], 2); // [['a', 'b'], ['c']]
+ * ```
  */
 export function ArrayChunk<T>(array: T[], size: number): T[][] {
 	if (!array || size <= 0) {

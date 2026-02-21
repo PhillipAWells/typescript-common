@@ -2,16 +2,27 @@ import { filterDangerousKeys } from './security-utils.js';
 import type { TObjectTransformer } from './types.js';
 
 /**
- * Creates a deep clone of an object with security protections
+ * Creates a deep clone of an object with security protections.
  *
  * **Security Features:**
- * - Prevents infinite recursion with circular reference detection
- * - Filters out dangerous properties that could cause prototype pollution
- * - Safely handles complex object structures
+ * - Prevents infinite recursion with circular reference detection.
+ * - Filters out dangerous properties that could cause prototype pollution.
+ * - Safely handles complex object structures.
  *
- * @param obj Object to clone
+ * @template T - The type of the object to clone
+ * @param obj - Object to clone
+ * @param visitedInput - Internal WeakSet used to detect circular references (do not pass manually)
  * @returns Deep clone of the object
- * @throws {Error} Throws if `obj` is a function, symbol, Map, Set, WeakMap, or class instance.
+ * @throws {Error} When `obj` contains circular references.
+ * @throws {Error} When `obj` is a function, symbol, `Map`, `Set`, `WeakMap`, or a class instance.
+ *
+ * @example
+ * ```typescript
+ * const original = { a: 1, b: { c: 2 } };
+ * const clone = ObjectClone(original);
+ * clone.b.c = 99;
+ * console.log(original.b.c); // 2  (original is not affected)
+ * ```
  */
 export function ObjectClone<T>(obj: T, visitedInput?: WeakSet<object>): T {
 	if (obj === null || obj === undefined) {

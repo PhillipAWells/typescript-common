@@ -1,7 +1,15 @@
 /**
- * Creates an object from an array of key-value pairs
- * @param entries Array of [key, value] tuples
- * @returns Object with keys and values from the entries
+ * Creates an object from an array of key-value pair tuples.
+ * The inverse of {@link ObjectToKeyValuePairs}.
+ *
+ * @template T - The value type
+ * @param entries - Array of `[key, value]` tuples
+ * @returns Object whose keys and values come from `entries`
+ *
+ * @example
+ * ```typescript
+ * ObjectFromKeyValuePairs([['a', 1], ['b', 2]]); // { a: 1, b: 2 }
+ * ```
  */
 export function ObjectFromKeyValuePairs<T = unknown>(entries: [string, T][]): Record<string, T> {
 	return entries.reduce((obj, [key, value]) => {
