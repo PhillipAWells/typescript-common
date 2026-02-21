@@ -1,0 +1,63 @@
+{
+	"name": "@pawells/typescript-common",
+	"displayName": "TypeScript Common Utilities",
+	"version": "1.0.0",
+	"description": "Shared TypeScript utility library — array, object, string, time, and enum helpers. ESM-only, no runtime dependencies.",
+	"type": "module",
+	"main": "./build/index.js",
+	"scripts": {
+		"build": "tsc",
+		"start": "node build/index.js",
+		"dev": "tsc && node build/index.js",
+		"watch": "tsc --watch",
+		"typecheck": "tsc --noEmit",
+		"lint": "eslint src/",
+		"lint:fix": "eslint src/ --fix",
+		"test": "vitest run",
+		"test:ui": "vitest --ui",
+		"test:coverage": "vitest --coverage",
+		"prepublishOnly": "npm run build",
+		"prepare": "husky"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@eslint/js": "^10.0.1",
+		"@stylistic/eslint-plugin": "^5.9.0",
+		"@types/node": "^25.3.0",
+		"@typescript-eslint/eslint-plugin": "^8.0.0",
+		"@typescript-eslint/parser": "^8.0.0",
+		"@vitest/coverage-v8": "^4.0.18",
+		"@vitest/ui": "^4.0.18",
+		"eslint": "^10.0.1",
+		"eslint-import-resolver-typescript": "^4.4.4",
+		"eslint-plugin-import": "^2.31.0",
+		"eslint-plugin-unused-imports": "^4.0.0",
+		"globals": "^17.3.0",
+		"husky": "^9.1.7",
+		"typescript": "^5.3.3",
+		"vitest": "^4.0.18"
+	},
+	"keywords": [],
+	"author": "Phillip Aaron Wells",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/PhillipAWells/typescript-common.git"
+	},
+	"bugs": {
+		"url": "https://github.com/PhillipAWells/typescript-common/issues"
+	},
+	"homepage": "https://github.com/PhillipAWells/typescript-common#readme",
+	"engines": {
+		"node": ">=24.0.0"
+	},
+	"files": [
+		"build/",
+		"README.md",
+		"LICENSE",
+		".env.example"
+	],
+	"publishConfig": {
+		"access": "public"
+	}
+}
