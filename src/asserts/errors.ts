@@ -19,7 +19,7 @@ export class BaseError extends Error {
 	public readonly Code: string;
 
 	public readonly Context: Record<string, unknown> | undefined;
-	
+
 	/**
 	 * @param message - Human-readable description of the error
 	 * @param code - Machine-readable error code (e.g. `'VALIDATION_ERROR'`)
