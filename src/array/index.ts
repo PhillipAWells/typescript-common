@@ -25,3 +25,4 @@ export * from './array-count-by.js';
 export * from './array-sample.js';
 export type * from './array-element.js';
 export type { TPredicate, TTransform, TComparator, TEqualityComparator } from './types.js';
+export * from './assert.js';
