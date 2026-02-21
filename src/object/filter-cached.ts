@@ -8,10 +8,22 @@ const CACHE_EVICTION_PERCENTAGE = 0.2; // 20%
 const INITIAL_CACHE_HASH_LENGTH = 16;
 
 /**
- * Creates a cached version of filter for improved performance when filtering the same objects repeatedly
+ * Creates a cached version of {@link ObjectFilter} for improved performance
+ * when filtering the same objects repeatedly.
  *
- * @param options Configuration options for both the cache and the underlying filter
- * @returns A cached version of the filter function
+ * Results are cached by hashing the filter and object together. When the cache
+ * exceeds `maxCacheSize`, approximately 20% of the entries in the largest
+ * per-filter bucket are evicted.
+ *
+ * @template T - The object type being filtered
+ * @param options - Configuration for both the cache and the underlying filter
+ * @returns A cached filter function `(cursor, filter) => Promise<boolean>`
+ *
+ * @example
+ * ```typescript
+ * const cachedFilter = ObjectFilterCached<User>({ maxCacheSize: 500 });
+ * const isAdmin = await cachedFilter(user, { role: 'admin' });
+ * ```
  */
 export function ObjectFilterCached<T extends object>(options: ICachedObjectFilterOptions = {}): TCachedObjectFilterFunction<T> {
 	const {

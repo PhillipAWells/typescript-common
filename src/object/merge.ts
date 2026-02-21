@@ -1,16 +1,27 @@
 import { filterDangerousKeys } from './security-utils.js';
 
 /**
- * Merges two objects deeply with security protections
+ * Merges two objects deeply with security protections.
+ *
+ * **Merge behaviour:**
+ * - Primitive values from `source` overwrite those in `target`.
+ * - Arrays are concatenated (target array followed by source array).
+ * - Plain objects are recursively merged.
  *
  * **Security Features:**
- * - Prevents prototype pollution by filtering dangerous keys
- * - Safely handles nested object merging
- * - Protects against malicious source objects
+ * - Prevents prototype pollution by filtering dangerous keys (`__proto__`, `constructor`, `prototype`).
+ * - Safely handles nested object merging.
  *
- * @param target Target object
- * @param source Source object
- * @returns Merged object
+ * @template T - The type of the target object
+ * @param target - Target object (base values)
+ * @param source - Source object (values to merge in)
+ * @returns A new merged object (neither `target` nor `source` is mutated)
+ *
+ * @example
+ * ```typescript
+ * ObjectMerge({ a: 1, b: { x: 1 } }, { b: { y: 2 }, c: 3 });
+ * // { a: 1, b: { x: 1, y: 2 }, c: 3 }
+ * ```
  */
 export function ObjectMerge<T extends object = object>(target: T, source: Partial<T>): T {
 	if (!target || typeof target !== 'object') return target as T;

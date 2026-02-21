@@ -1,8 +1,17 @@
 /**
- * Checks whether an object contains circular references
+ * Checks whether an object (or any nested value) contains circular references.
  *
- * @param obj - The object to check for circular references
- * @returns True if the object contains circular references, false otherwise
+ * @param obj - The value to inspect
+ * @returns `true` if a circular reference is detected, `false` otherwise
+ *
+ * @example
+ * ```typescript
+ * ObjectHasCircularReference({ a: 1, b: { c: 2 } }); // false
+ *
+ * const circular: any = { a: 1 };
+ * circular.self = circular;
+ * ObjectHasCircularReference(circular); // true
+ * ```
  */
 export function ObjectHasCircularReference(obj: unknown): boolean {
 	const seen = new WeakSet();
