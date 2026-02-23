@@ -1,7 +1,7 @@
 {
 	"name": "@pawells/typescript-common",
 	"displayName": "TypeScript Common Utilities",
-	"version": "1.1.2",
+	"version": "1.1.3",
 	"description": "Shared TypeScript utility library — array, object, string, time, and enum helpers. ESM-only, no runtime dependencies.",
 	"type": "module",
 	"main": "./build/index.js",
