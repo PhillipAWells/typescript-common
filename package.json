@@ -19,7 +19,6 @@
 		"prepublishOnly": "npm run build",
 		"prepare": "husky"
 	},
-	"dependencies": {},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
 		"@stylistic/eslint-plugin": "^5.9.0",

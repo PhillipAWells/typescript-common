@@ -6,6 +6,7 @@ dist/
 node_modules/
 
 # Environment and secrets
+.yarn
 .env
 .env.local
 .env.*.local
