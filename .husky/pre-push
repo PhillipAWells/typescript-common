@@ -1,1 +1,2 @@
+#!/bin/sh
 yarn typecheck && yarn lint && yarn test && yarn build
