@@ -21,8 +21,10 @@ export function ArrayRange(start: number, end: number, step = 1): number[] {
 
 	const result: number[] = [];
 
-	for (let i = start; step > 0 ? i < end : i > end; i += step) {
-		result.push(i);
+	// Use mathematical iteration count to avoid floating-point accumulation errors
+	const iterations = Math.round(Math.abs(end - start) / Math.abs(step));
+	for (let i = 0; i < iterations; i++) {
+		result.push(start + i * step);
 	}
 
 	return result;

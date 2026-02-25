@@ -4,9 +4,12 @@
  *
  * Only suitable for **pure functions** with serialisable arguments.
  *
+ * Implements LRU (Least Recently Used) eviction when the cache reaches `maxCacheSize`.
+ *
  * @template T - The wrapped function type
  * @param fn - The function to memoize
  * @param keyFn - Optional custom cache-key function
+ * @param maxCacheSize - Maximum number of cache entries before LRU eviction (default: 1000)
  * @returns A memoized function with the same signature as `fn`
  *
  * @example
@@ -17,11 +20,16 @@
  *
  * // Custom key function:
  * const getUser = Memoize(fetchUser, (id) => `user:${id}`);
+ *
+ * // With custom cache size:
+ * const cached = Memoize(fn, undefined, 500);
  * ```
  */
 export function Memoize<T extends (...args: any[]) => any>(
 	fn: T,
 	keyFn?: (...args: Parameters<T>) => string,
+	// eslint-disable-next-line no-magic-numbers
+	maxCacheSize = 1000,
 ): T {
 	const cache = new Map<string, ReturnType<T>>();
 
@@ -33,6 +41,13 @@ export function Memoize<T extends (...args: any[]) => any>(
 		}
 
 		const result = fn(...args) as ReturnType<T>;
+
+		// Implement LRU eviction: if cache is full, remove oldest entry before adding new one
+		if (cache.size >= maxCacheSize) {
+			const oldestKey = cache.keys().next().value as string;
+			cache.delete(oldestKey);
+		}
+
 		cache.set(key, result);
 		return result;
 	} as T;
