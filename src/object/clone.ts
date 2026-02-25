@@ -72,7 +72,11 @@ export function ObjectClone<T>(obj: T, visitedInput?: WeakSet<object>): T {
 		return obj;
 	}
 
-	throw new Error(`Unable to copy obj! Its type is not supported: ${typeof obj}`);
+	// Provide detailed error message for unsupported types
+	const typeName = typeof obj === 'object'
+		? obj.constructor.name
+		: typeof obj;
+	throw new Error(`ObjectClone: ${typeName} objects are not supported. Create a new ${typeName} instance manually.`);
 }
 
 /**
