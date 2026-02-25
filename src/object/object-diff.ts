@@ -17,6 +17,15 @@ export interface IObjectDiffResult {
  * - **changed** — keys present in both whose values are not strictly equal
  *   (compared via `JSON.stringify` for deep value equality)
  *
+ * **Important**: Value comparison uses `JSON.stringify`, which has limitations:
+ * - Functions, `undefined`, and `Symbol` values are not compared correctly
+ *   (they may serialize to `undefined` or be omitted)
+ * - Circular references will throw an error
+ * - Objects with identical structure but different prototypes are considered equal
+ *
+ * For values containing functions, `undefined`, symbols, or circular references,
+ * consider a custom comparison function or pre-filtering the objects.
+ *
  * @param objA - The baseline object ("before")
  * @param objB - The comparison object ("after")
  * @returns {@link IObjectDiffResult}
