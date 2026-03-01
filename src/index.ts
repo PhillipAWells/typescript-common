@@ -45,6 +45,9 @@ export * as EnumUtils from './enum/index.js';
 // Function utilities
 export * as FunctionUtils from './function/index.js';
 
+// LRU Cache
+export { LRUCache } from './lru-cache.js';
+
 // Direct exports for commonly used functions
 export {
 	// Array utilities
