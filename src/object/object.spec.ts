@@ -17,6 +17,7 @@ import { ObjectSortKeys } from './sort-keys.js';
 import { ObjectInvert } from './object-invert.js';
 import { ObjectFlatten } from './object-flatten.js';
 import { ObjectDiff } from './object-diff.js';
+import { CreateJsonCircularReplacer } from './json-circular-replacer.js';
 
 // ----- IsObject -----
 
@@ -759,5 +760,99 @@ describe('ObjectGetPropertyByPath (extended)', () => {
 
 	it('returns default for a path with consecutive dots', () => {
 		expect(ObjectGetPropertyByPath({ a: 1 }, 'a..b', 'fallback')).toBe('fallback');
+	});
+});
+
+// ----- CreateJsonCircularReplacer -----
+
+describe('CreateJsonCircularReplacer', () => {
+	it('serializes a simple object without modification', () => {
+		const obj = { a: 1, b: 'hello', c: true };
+		const result = JSON.stringify(obj, CreateJsonCircularReplacer());
+		expect(result).toBe('{"a":1,"b":"hello","c":true}');
+	});
+
+	it('serializes nested objects without modification', () => {
+		const obj = { a: { b: { c: 1 } } };
+		const result = JSON.stringify(obj, CreateJsonCircularReplacer());
+		expect(result).toBe('{"a":{"b":{"c":1}}}');
+	});
+
+	it('handles circular reference to self', () => {
+		const obj: any = { a: 1 };
+		obj.self = obj;
+		const result = JSON.stringify(obj, CreateJsonCircularReplacer());
+		expect(result).toBe('{"a":1,"self":"[Circular]"}');
+	});
+
+	it('handles deeply nested circular reference', () => {
+		const obj: any = { a: { b: { c: {} } } };
+		obj.a.b.c.root = obj;
+		const result = JSON.stringify(obj, CreateJsonCircularReplacer());
+		expect(result).toBe('{"a":{"b":{"c":{"root":"[Circular]"}}}}');
+	});
+
+	it('handles circular reference in array', () => {
+		const obj: any = { items: [] };
+		obj.items.push(obj);
+		const result = JSON.stringify(obj, CreateJsonCircularReplacer());
+		expect(result).toBe('{"items":["[Circular]"]}');
+	});
+
+	it('allows shared references (DAG) that are not circular', () => {
+		const shared = { x: 1 };
+		const obj = { a: shared, b: shared };
+		const result = JSON.stringify(obj, CreateJsonCircularReplacer());
+		expect(result).toBe('{"a":{"x":1},"b":{"x":1}}');
+	});
+
+	it('allows shared arrays that are not circular', () => {
+		const arr = [1, 2, 3];
+		const obj = { x: arr, y: arr };
+		const result = JSON.stringify(obj, CreateJsonCircularReplacer());
+		expect(result).toBe('{"x":[1,2,3],"y":[1,2,3]}');
+	});
+
+	it('uses custom placeholder string', () => {
+		const obj: any = { a: 1 };
+		obj.self = obj;
+		const result = JSON.stringify(obj, CreateJsonCircularReplacer('[Ref]'));
+		expect(result).toBe('{"a":1,"self":"[Ref]"}');
+	});
+
+	it('handles null values', () => {
+		const obj = { a: null, b: 1 };
+		const result = JSON.stringify(obj, CreateJsonCircularReplacer());
+		expect(result).toBe('{"a":null,"b":1}');
+	});
+
+	it('handles arrays with primitives', () => {
+		const obj = { arr: [1, 'two', null, true] };
+		const result = JSON.stringify(obj, CreateJsonCircularReplacer());
+		expect(result).toBe('{"arr":[1,"two",null,true]}');
+	});
+
+	it('handles multiple circular references at different levels', () => {
+		const obj: any = { a: {} };
+		obj.a.parent = obj;
+		obj.self = obj;
+		const result = JSON.stringify(obj, CreateJsonCircularReplacer());
+		expect(result).toBe('{"a":{"parent":"[Circular]"},"self":"[Circular]"}');
+	});
+
+	it('each replacer instance is independent', () => {
+		const obj1: any = { id: 1 };
+		obj1.self = obj1;
+		const obj2: any = { id: 2 };
+		obj2.self = obj2;
+
+		const replacer1 = CreateJsonCircularReplacer();
+		const replacer2 = CreateJsonCircularReplacer();
+
+		const result1 = JSON.stringify(obj1, replacer1);
+		const result2 = JSON.stringify(obj2, replacer2);
+
+		expect(result1).toBe('{"id":1,"self":"[Circular]"}');
+		expect(result2).toBe('{"id":2,"self":"[Circular]"}');
 	});
 });
