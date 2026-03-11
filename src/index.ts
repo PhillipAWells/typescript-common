@@ -112,6 +112,7 @@ export {
 	ObjectInvert,
 	ObjectFlatten,
 	ObjectDiff,
+	CreateJsonCircularReplacer,
 } from './object/index.js';
 
 export {

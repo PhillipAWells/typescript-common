@@ -10,6 +10,7 @@
 
 // Functions
 export { ObjectHasCircularReference } from './has-circular-reference.js';
+export { CreateJsonCircularReplacer } from './json-circular-replacer.js';
 export { ObjectClone, TransformObject } from './clone.js';
 export { ObjectEquals } from './equals.js';
 export { ObjectFilter, FilterObject } from './filter.js';

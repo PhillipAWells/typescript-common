@@ -120,9 +120,8 @@ export class Stopwatch {
 	 */
 	public get Elapsed(): ElapsedTime {
 		const current = Date.now();
-		if (!this.Latest) return new ElapsedTime(0);
-
-		const first = this.First!;
+		const first = this.First;
+		if (!first) return new ElapsedTime(0);
 
 		if (this._pausedAt !== null) {
 			return new ElapsedTime(this._pausedAt - first.timestamp);
