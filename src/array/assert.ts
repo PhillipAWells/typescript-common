@@ -43,7 +43,9 @@ export type TDimensionConstraint = {
  * throw new ArrayError('Value is not a valid array');
  */
 export class ArrayError extends SimpleError {
-	constructor(message?: string) { super(message ?? 'Array assertion failed'); }
+	constructor(message?: string) {
+		super(message ?? 'Array assertion failed');
+	}
 }
 
 /**

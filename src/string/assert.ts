@@ -59,7 +59,9 @@ function getCachedRegex(source: string, flags: string = ''): RegExp {
  * throw new StringError('Value is not a valid string');
  */
 export class StringError extends SimpleError {
-	constructor(message?: string) { super(message ?? 'String Assertion Failed'); }
+	constructor(message?: string) {
+		super(message ?? 'String Assertion Failed');
+	}
 }
 
 /**

@@ -9,7 +9,9 @@ import { SimpleError } from '../asserts/errors.js';
  * throw new BooleanError('Value is not a valid boolean');
  */
 export class BooleanError extends SimpleError {
-	constructor(message?: string) { super(message ?? 'Invalid Boolean'); }
+	constructor(message?: string) {
+		super(message ?? 'Invalid Boolean');
+	}
 }
 
 /**

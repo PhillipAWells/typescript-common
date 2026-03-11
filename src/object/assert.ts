@@ -12,7 +12,9 @@ const MAX_VALUE_DISPLAY_LENGTH = 100;
  * throw new ObjectError('Value is not a valid object');
  */
 export class ObjectError extends SimpleError {
-	constructor(message?: string) { super(message ?? 'Object assertion failed'); }
+	constructor(message?: string) {
+		super(message ?? 'Object assertion failed');
+	}
 }
 
 /**
@@ -22,7 +24,9 @@ export class ObjectError extends SimpleError {
  * throw new PropertyError('Object is missing required property');
  */
 export class ObjectPropertyError extends SimpleError {
-	constructor(message?: string) { super(message ?? 'Object Property Assertion Failed'); }
+	constructor(message?: string) {
+		super(message ?? 'Object Property Assertion Failed');
+	}
 }
 
 /**
@@ -70,8 +74,8 @@ export function AssertObject(value: unknown, exception: IAssertException = {}): 
 		} catch {
 			valueStr = String(value);
 		}
-		 
-		SetExceptionMessage(exception, `Expected object but received ${actualType}: ${valueStr.slice(0, MAX_VALUE_DISPLAY_LENGTH)}`);  
+
+		SetExceptionMessage(exception, `Expected object but received ${actualType}: ${valueStr.slice(0, MAX_VALUE_DISPLAY_LENGTH)}`);
 		ThrowException(exception);
 	}
 }

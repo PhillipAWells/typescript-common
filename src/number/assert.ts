@@ -17,7 +17,9 @@ import { SimpleError } from '../asserts/errors.js';
  * ```
  */
 export class NumberError extends SimpleError {
-	constructor(message?: string) { super(message ?? 'Value is not a valid number'); }
+	constructor(message?: string) {
+		super(message ?? 'Value is not a valid number');
+	}
 }
 
 /**
@@ -37,7 +39,9 @@ export class NumberError extends SimpleError {
  * ```
  */
 export class NumberRangeError extends NumberError {
-	constructor(message?: string) { super(message ?? 'Value is not in the expected range'); }
+	constructor(message?: string) {
+		super(message ?? 'Value is not in the expected range');
+	}
 }
 
 /**
