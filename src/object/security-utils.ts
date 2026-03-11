@@ -44,11 +44,6 @@ export function isPropertyKeySafe(key: string): boolean {
 		return false;
 	}
 
-	// Check for properties starting with __ (dunder methods)
-	if (key.startsWith('__')) {
-		return false;
-	}
-
 	// Check for path traversal patterns
 	for (const pattern of PATH_TRAVERSAL_PATTERNS) {
 		if (pattern.test(key)) {
