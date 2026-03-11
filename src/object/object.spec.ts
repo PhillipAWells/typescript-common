@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { AssertObject } from './assert-object.js';
+import { IsObject } from './assert-object.js';
 import { ObjectClone } from './clone.js';
 import { ObjectEquals } from './equals.js';
 import { ObjectFilter, FilterObject } from './filter.js';
@@ -18,29 +18,29 @@ import { ObjectInvert } from './object-invert.js';
 import { ObjectFlatten } from './object-flatten.js';
 import { ObjectDiff } from './object-diff.js';
 
-// ----- AssertObject -----
+// ----- IsObject -----
 
-describe('AssertObject', () => {
+describe('IsObject', () => {
 	it('returns true for a plain object', () => {
-		expect(AssertObject({ a: 1 })).toBe(true);
+		expect(IsObject({ a: 1 })).toBe(true);
 	});
 
 	it('returns false for null', () => {
-		expect(AssertObject(null)).toBe(false);
+		expect(IsObject(null)).toBe(false);
 	});
 
 	it('returns false for arrays', () => {
-		expect(AssertObject([1, 2, 3])).toBe(false);
+		expect(IsObject([1, 2, 3])).toBe(false);
 	});
 
 	it('returns false for primitives', () => {
-		expect(AssertObject(42)).toBe(false);
-		expect(AssertObject('string')).toBe(false);
-		expect(AssertObject(true)).toBe(false);
+		expect(IsObject(42)).toBe(false);
+		expect(IsObject('string')).toBe(false);
+		expect(IsObject(true)).toBe(false);
 	});
 
 	it('returns true for empty object', () => {
-		expect(AssertObject({})).toBe(true);
+		expect(IsObject({})).toBe(true);
 	});
 });
 

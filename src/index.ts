@@ -93,7 +93,7 @@ export {
 
 export {
 	// Object utilities
-	AssertObject,
+	IsObject,
 	ObjectClone,
 	TransformObject,
 	ObjectEquals,
@@ -117,6 +117,7 @@ export {
 export {
 	// Time utilities
 	ElapsedTime,
+	FormatElapsedTime,
 	Stopwatch,
 } from './time/index.js';
 
@@ -143,7 +144,6 @@ export {
 
 export {
 	// Asserts utilities
-	// (AssertObject is omitted here — it conflicts with ObjectUtils.AssertObject; use AssertsUtils.AssertObject instead)
 	AssertArray,
 	AssertArray2D,
 	AssertArrayAll,
@@ -159,6 +159,7 @@ export {
 	AssertNotNull,
 	AssertNull,
 	AssertNumber,
+	AssertObject,
 	AssertObjectHasOwnProperty,
 	AssertObjectHasProperty,
 	AssertObjectPropertyNotNull,
