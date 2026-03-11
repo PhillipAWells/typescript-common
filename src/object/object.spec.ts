@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { AssertObject } from './assert-object.js';
 import { ObjectClone } from './clone.js';
 import { ObjectEquals } from './equals.js';
-import { ObjectFilter } from './filter.js';
+import { ObjectFilter, FilterObject } from './filter.js';
 import { ObjectFilterCached } from './filter-cached.js';
 import { ObjectHasCircularReference } from './has-circular-reference.js';
 import { ObjectHash } from './hash.js';
@@ -12,7 +12,7 @@ import { MapObjectCached } from './map-cached.js';
 import { ObjectMerge } from './merge.js';
 import { ObjectOmit } from './omit.js';
 import { ObjectPick } from './pick.js';
-import { ObjectGetPropertyByPath } from './property-paths.js';
+import { ObjectGetPropertyByPath, ObjectSetPropertyByPath } from './property-paths.js';
 import { ObjectSortKeys } from './sort-keys.js';
 import { ObjectInvert } from './object-invert.js';
 import { ObjectFlatten } from './object-flatten.js';
@@ -297,6 +297,12 @@ describe('MapObjectCached', () => {
 		// Mapper is called once per key on first call, zero times on subsequent cached calls
 		expect(mapper).toHaveBeenCalledTimes(1);
 	});
+
+	it('returns empty object for null/invalid cursor', async () => {
+		const mapFn = MapObjectCached<{ a: number }>();
+		const result = await mapFn(null as any, (_, v) => v);
+		expect(result).toEqual({});
+	});
 });
 
 // ----- ObjectMerge -----
@@ -530,5 +536,228 @@ describe('ObjectDiff', () => {
 		expect(result.added).toEqual({ d: 4 });
 		expect(result.removed).toEqual({ a: 1 });
 		expect(result.changed).toEqual({ b: { from: 2, to: 99 } });
+	});
+});
+
+// ----- ObjectHasCircularReference (shared-reference regression) -----
+
+describe('ObjectHasCircularReference (DAG)', () => {
+	it('returns false for objects sharing the same sub-object', () => {
+		const shared = { x: 1 };
+		expect(ObjectHasCircularReference({ a: shared, b: shared })).toBe(false);
+	});
+
+	it('returns false for objects sharing the same array', () => {
+		const arr = [1, 2, 3];
+		expect(ObjectHasCircularReference({ x: arr, y: arr })).toBe(false);
+	});
+
+	it('still returns true for genuine circular references', () => {
+		const obj: any = { a: 1 };
+		obj.self = obj;
+		expect(ObjectHasCircularReference(obj)).toBe(true);
+	});
+});
+
+// ----- ObjectClone (shared-reference regression) -----
+
+describe('ObjectClone (DAG)', () => {
+	it('clones an object whose Date appears at multiple keys without throwing', () => {
+		const d = new Date('2024-01-01');
+		const obj = { created: d, updated: d };
+		expect(() => ObjectClone(obj)).not.toThrow();
+		const cloned = ObjectClone(obj);
+		expect(cloned.created).toEqual(d);
+		expect(cloned.updated).toEqual(d);
+		expect(cloned.created).not.toBe(d);
+	});
+
+	it('clones an object whose nested object appears at multiple keys without throwing', () => {
+		const meta = { version: 1 };
+		const obj = { a: meta, b: meta };
+		expect(() => ObjectClone(obj)).not.toThrow();
+		const cloned = ObjectClone(obj);
+		expect(cloned.a).toEqual(meta);
+		expect(cloned.b).toEqual(meta);
+	});
+});
+
+// ----- ObjectFilter (extended) -----
+
+describe('ObjectFilter (extended)', () => {
+	it('matches a null value at a nested path', () => {
+		const obj = { user: { address: null } };
+		expect(ObjectFilter(obj, { 'user.address': null })).toBe(true);
+	});
+
+	it('does not match a non-null value against null at a nested path', () => {
+		const obj = { user: { address: 'somewhere' } };
+		expect(ObjectFilter(obj, { 'user.address': null })).toBe(false);
+	});
+
+	it('returns false when an intermediate path segment is null', () => {
+		const obj = { user: null };
+		expect(ObjectFilter(obj as any, { 'user.name': 'Alice' })).toBe(false);
+	});
+
+	it('checks string inclusion in an array value', () => {
+		const obj = { tags: ['javascript', 'typescript'] };
+		expect(ObjectFilter(obj, { tags: 'javascript' })).toBe(true);
+		expect(ObjectFilter(obj, { tags: 'python' })).toBe(false);
+	});
+
+	it('checks array subset matching', () => {
+		const obj = { tags: ['javascript', 'typescript', 'node'] };
+		expect(ObjectFilter(obj, { tags: ['javascript', 'typescript'] })).toBe(true);
+		expect(ObjectFilter(obj, { tags: ['javascript', 'python'] })).toBe(false);
+	});
+
+	it('checks non-string value inclusion in array', () => {
+		const obj = { scores: [1, 2, 3] };
+		expect(ObjectFilter(obj, { scores: 2 })).toBe(true);
+		expect(ObjectFilter(obj, { scores: 5 })).toBe(false);
+	});
+
+	it('matches nested objects with useDeepEqual', () => {
+		const obj = { meta: { type: 'user', active: true } };
+		expect(ObjectFilter(obj, { meta: { type: 'user' } }, { useDeepEqual: true })).toBe(true);
+		expect(ObjectFilter(obj, { meta: { type: 'admin' } }, { useDeepEqual: true })).toBe(false);
+	});
+
+	it('returns false for missing direct properties', () => {
+		expect(ObjectFilter({ a: 1 }, { b: 1 })).toBe(false);
+	});
+
+	it('blocks invalid paths when validatePaths is true', () => {
+		expect(ObjectFilter({ a: 1 }, { '../malicious': 1 }, { validatePaths: true })).toBe(false);
+		expect(ObjectFilter({ a: 1 }, { 'a..b': 1 }, { validatePaths: true })).toBe(false);
+	});
+
+	it('handles NaN filter values matched in arrays', () => {
+		const obj = { scores: [NaN, 1, 2] };
+		expect(ObjectFilter(obj, { scores: NaN })).toBe(true);
+	});
+
+	it('matches array of objects with useDeepEqual (subset matching)', () => {
+		// This exercises objectCompareValues with objects when useDeepEqual = true
+		const obj = { items: [{ id: 1, name: 'Book' }, { id: 2, name: 'Pen' }] };
+		expect(ObjectFilter(obj, { items: [{ id: 1 }] }, { useDeepEqual: true })).toBe(true);
+		expect(ObjectFilter(obj, { items: [{ id: 99 }] }, { useDeepEqual: true })).toBe(false);
+	});
+
+	it('matches nested objects via dot notation with useDeepEqual', () => {
+		// This exercises the dot-notation + useDeepEqual branch in ObjectFilter
+		const obj = { user: { details: { role: 'admin', active: true } } };
+		expect(ObjectFilter(obj, { 'user.details': { role: 'admin' } }, { useDeepEqual: true })).toBe(true);
+		expect(ObjectFilter(obj, { 'user.details': { role: 'guest' } }, { useDeepEqual: true })).toBe(false);
+	});
+
+	it('case-insensitive match in string arrays', () => {
+		const obj = { tags: ['JavaScript', 'TypeScript'] };
+		expect(ObjectFilter(obj, { tags: 'javascript' }, { caseInsensitiveStrings: true })).toBe(true);
+	});
+});
+
+// ----- FilterObject -----
+
+describe('FilterObject', () => {
+	it('keeps properties where predicate returns true', () => {
+		const obj = { a: 1, b: 2, c: 3 };
+		expect(FilterObject(obj, (_, v) => (v as number) > 1)).toEqual({ b: 2, c: 3 });
+	});
+
+	it('filters by key', () => {
+		const obj = { name: 'Alice', age: 30 };
+		expect(FilterObject(obj, (k) => k === 'name')).toEqual({ name: 'Alice' });
+	});
+
+	it('returns empty object when no properties match', () => {
+		expect(FilterObject({ a: 1, b: 2 }, () => false)).toEqual({});
+	});
+
+	it('returns empty object for null/invalid input', () => {
+		expect(FilterObject(null as any, () => true)).toEqual({});
+	});
+
+	it('returns all properties when predicate always returns true', () => {
+		const obj = { x: 10, y: 20 };
+		expect(FilterObject(obj, () => true)).toEqual({ x: 10, y: 20 });
+	});
+});
+
+// ----- ObjectSetPropertyByPath -----
+
+describe('ObjectSetPropertyByPath', () => {
+	it('sets a simple nested property, creating intermediates', () => {
+		const obj: any = { name: 'Alice' };
+		ObjectSetPropertyByPath(obj, 'profile.age', 30);
+		expect(obj.profile.age).toBe(30);
+	});
+
+	it('sets a deeply nested property', () => {
+		const obj: any = {};
+		ObjectSetPropertyByPath(obj, 'a.b.c', 42);
+		expect(obj.a.b.c).toBe(42);
+	});
+
+	it('overwrites an existing top-level property', () => {
+		const obj: any = { value: 1 };
+		ObjectSetPropertyByPath(obj, 'value', 2);
+		expect(obj.value).toBe(2);
+	});
+
+	it('overwrites an existing nested property', () => {
+		const obj: any = { user: { name: 'Alice' } };
+		ObjectSetPropertyByPath(obj, 'user.name', 'Bob');
+		expect(obj.user.name).toBe('Bob');
+	});
+
+	it('replaces a non-object intermediate with a new object', () => {
+		const obj: any = { a: 42 };
+		ObjectSetPropertyByPath(obj, 'a.b', 'hello');
+		expect(obj.a.b).toBe('hello');
+	});
+
+	it('safely ignores a null/undefined target object', () => {
+		expect(() => ObjectSetPropertyByPath(null as any, 'a.b', 1)).not.toThrow();
+	});
+
+	it('safely ignores an empty path', () => {
+		const obj: any = {};
+		expect(() => ObjectSetPropertyByPath(obj, '', 1)).not.toThrow();
+		expect(obj).toEqual({});
+	});
+
+	it('blocks prototype pollution via __proto__', () => {
+		const obj: any = {};
+		ObjectSetPropertyByPath(obj, '__proto__.polluted', true);
+		expect(({} as any).polluted).toBeUndefined();
+	});
+
+	it('blocks prototype pollution via constructor.prototype', () => {
+		const obj: any = {};
+		ObjectSetPropertyByPath(obj, 'constructor.prototype.evil', true);
+		expect((obj as any).evil).toBeUndefined();
+	});
+});
+
+// ----- ObjectGetPropertyByPath (extended) -----
+
+describe('ObjectGetPropertyByPath (extended)', () => {
+	it('returns undefined when an intermediate segment value is a primitive', () => {
+		// obj.a is a number, so obj.a.b cannot exist as an own property
+		expect(ObjectGetPropertyByPath({ a: 5 }, 'a.b')).toBeUndefined();
+	});
+
+	it('returns null when the target property value is null', () => {
+		expect(ObjectGetPropertyByPath({ a: { b: null } }, 'a.b')).toBeNull();
+	});
+
+	it('returns default when path contains a dangerous segment', () => {
+		expect(ObjectGetPropertyByPath({}, '__proto__.constructor', 'safe')).toBe('safe');
+	});
+
+	it('returns default for a path with consecutive dots', () => {
+		expect(ObjectGetPropertyByPath({ a: 1 }, 'a..b', 'fallback')).toBe('fallback');
 	});
 });
