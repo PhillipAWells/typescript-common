@@ -5,7 +5,6 @@ import type { TPropertyMapper, ICachedObjectMapOptions } from './types.js';
 // Cache configuration constants
 const DEFAULT_MAX_CACHE_SIZE = 1000;
 const CACHE_EVICTION_PERCENTAGE = 0.2; // 20%
-const INITIAL_CACHE_HASH_LENGTH = 16;
 
 /**
  * Creates a cached version of {@link MapObject} for improved performance
@@ -92,11 +91,11 @@ export function MapObjectCached<T extends object>(options: ICachedObjectMapOptio
 			cache.set(resolvedMapperKey, objectCache);
 		}
 
-		// Create optimized hash-based cache key for the object being mapped
+		// Generate a full hash as the cache key for the object being mapped
 		let objectKey: string;
 
 		try {
-			objectKey = ObjectHash(cursor).substring(0, INITIAL_CACHE_HASH_LENGTH);
+			objectKey = ObjectHash(cursor);
 		} catch {
 			// If object has circular references, skip caching and compute directly
 			return Promise.resolve(MapObject(cursor, mapper));

@@ -5,7 +5,6 @@ import type { ICachedObjectFilterOptions, TCachedObjectFilterFunction, IObjectFi
 // Cache configuration constants
 const DEFAULT_MAX_CACHE_SIZE = 1000;
 const CACHE_EVICTION_PERCENTAGE = 0.2; // 20%
-const INITIAL_CACHE_HASH_LENGTH = 16;
 
 /**
  * Creates a cached version of {@link ObjectFilter} for improved performance
@@ -89,8 +88,8 @@ export function ObjectFilterCached<T extends object>(options: ICachedObjectFilte
 			return Promise.resolve(true); // Empty filter matches everything
 		}
 
-		// Optimize cache key generation with shorter hash for better performance
-		const filterKey = ObjectHash(filter).substring(0, INITIAL_CACHE_HASH_LENGTH);
+		// Generate a full hash as the cache key for this filter
+		const filterKey = ObjectHash(filter);
 
 		// Try to get the object cache for this filter
 		let objectCache = cache.get(filterKey);
@@ -99,12 +98,11 @@ export function ObjectFilterCached<T extends object>(options: ICachedObjectFilte
 			cache.set(filterKey, objectCache);
 		}
 
-		// Create optimized hash-based cache key for the object being filtered
-		// Use shorter hash for better memory efficiency and performance
+		// Generate a full hash as the cache key for the object being filtered
 		let objectKey: string;
 
 		try {
-			objectKey = ObjectHash(cursor).substring(0, INITIAL_CACHE_HASH_LENGTH);
+			objectKey = ObjectHash(cursor);
 		} catch {
 			// If object has circular references, skip caching and compute directly
 			const filterOptions: IObjectFilterOptions = {
