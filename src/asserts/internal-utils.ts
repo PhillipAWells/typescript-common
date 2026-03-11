@@ -110,7 +110,7 @@ export function ObjectEquals(a: any, b: any): boolean {
 	}
 
 	for (const symbol of symbolsA) {
-		if (!Object.getOwnPropertySymbols(b).includes(symbol)) return false;
+		if (!symbolsB.includes(symbol)) return false;
 		if (!ObjectEquals(a[symbol], b[symbol])) return false;
 	}
 
