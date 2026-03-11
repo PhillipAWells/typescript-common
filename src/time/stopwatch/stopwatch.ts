@@ -29,6 +29,8 @@ export class Stopwatch {
 
 	private _pausedAt: number | null = null;
 
+	private _stopped: boolean = false;
+
 	/**
 	 * Creates a new `Stopwatch` instance.
 	 *
@@ -54,7 +56,29 @@ export class Stopwatch {
 	 * @returns `true` if the stopwatch has been started and is not currently paused or stopped.
 	 */
 	public get Running(): boolean {
-		return this.First !== undefined && this._pausedAt === null;
+		return this.First !== undefined && this._pausedAt === null && !this._stopped;
+	}
+
+	/**
+	 * Whether the stopwatch has been explicitly stopped via {@link Stop}.
+	 *
+	 * A stopped stopwatch cannot be resumed with {@link Resume} — call
+	 * {@link Reset} and then {@link Start} to begin again.
+	 *
+	 * @returns `true` if {@link Stop} has been called, `false` if the stopwatch
+	 *   is running, paused, or has never been started.
+	 *
+	 * @example
+	 * ```typescript
+	 * const sw = new Stopwatch(true);
+	 * sw.Pause();
+	 * console.log(sw.Stopped); // false — paused, not stopped
+	 * sw.Stop();
+	 * console.log(sw.Stopped); // true
+	 * ```
+	 */
+	public get Stopped(): boolean {
+		return this._stopped;
 	}
 
 	/**
@@ -188,6 +212,7 @@ export class Stopwatch {
 			// Not stopped yet, so stop it
 			const current = Date.now();
 			this._pausedAt = current;
+			this._stopped = true;
 
 			const entry = new StopwatchEntry(current, this, this._times.length);
 			this._times.push(entry);
@@ -331,5 +356,6 @@ export class Stopwatch {
 	public Reset(): void {
 		this._times = [];
 		this._pausedAt = null;
+		this._stopped = false;
 	}
 }
