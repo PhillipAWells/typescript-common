@@ -190,6 +190,10 @@ export function AssertStringMatches(value: string, regex: RegExp, exception: IAs
 		testRegex = regex;
 	}
 
+	// Reset lastIndex before calling test() to avoid non-deterministic results
+	// when the regex has the global (g) or sticky (y) flag set.
+	testRegex.lastIndex = 0;
+
 	if (!testRegex.test(value)) {
 		SetExceptionMessage(exception, `String does not match the required pattern: ${regex.toString()}`);
 		ThrowException(exception);
