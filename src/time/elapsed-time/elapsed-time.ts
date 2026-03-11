@@ -134,13 +134,17 @@ export class ElapsedTime {
 		return this._Hours;
 	}
 
+	private static _pad(value: number, length: number): string {
+		return value.toString().padStart(length, '0');
+	}
+
 	/**
 	 * Gets the hours component as a padded string.
 	 * @param length The minimum length to pad to (default: 2).
 	 * @returns The zero-padded string.
 	 */
 	public HoursPadded(length: number = 2): string {
-		return this.Hours.toString().padStart(length, '0');
+		return ElapsedTime._pad(this.Hours, length);
 	}
 
 	/**
@@ -157,7 +161,7 @@ export class ElapsedTime {
 	 * @returns The zero-padded string.
 	 */
 	public TotalHoursPadded(length: number = 2): string {
-		return this.TotalHours.toString().padStart(length, '0');
+		return ElapsedTime._pad(this.TotalHours, length);
 	}
 
 	/**
@@ -174,7 +178,7 @@ export class ElapsedTime {
 	 * @returns The zero-padded string.
 	 */
 	public MinutesPadded(length: number = 2): string {
-		return this.Minutes.toString().padStart(length, '0');
+		return ElapsedTime._pad(this.Minutes, length);
 	}
 
 	/**
@@ -191,7 +195,7 @@ export class ElapsedTime {
 	 * @returns The zero-padded string.
 	 */
 	public TotalMinutesPadded(length: number = 2): string {
-		return this.TotalMinutes.toString().padStart(length, '0');
+		return ElapsedTime._pad(this.TotalMinutes, length);
 	}
 
 	/**
@@ -208,7 +212,7 @@ export class ElapsedTime {
 	 * @returns The zero-padded string.
 	 */
 	public SecondsPadded(length: number = 2): string {
-		return this.Seconds.toString().padStart(length, '0');
+		return ElapsedTime._pad(this.Seconds, length);
 	}
 
 	/**
@@ -225,7 +229,7 @@ export class ElapsedTime {
 	 * @returns The zero-padded string.
 	 */
 	public TotalSecondsPadded(length: number = 2): string {
-		return this.TotalSeconds.toString().padStart(length, '0');
+		return ElapsedTime._pad(this.TotalSeconds, length);
 	}
 
 	/**
@@ -242,7 +246,7 @@ export class ElapsedTime {
 	 * @returns The zero-padded string.
 	 */
 	public MillisecondsPadded(length: number = PRECISION_DECIMAL_PLACES): string {
-		return this.Milliseconds.toString().padStart(length, '0');
+		return ElapsedTime._pad(this.Milliseconds, length);
 	}
 
 	/**
@@ -282,7 +286,7 @@ export class ElapsedTime {
 	 * ```
 	 */
 	public TotalMillisecondsPadded(length: number = PRECISION_DECIMAL_PLACES): string {
-		return this.TotalMilliseconds.toString().padStart(length, '0');
+		return ElapsedTime._pad(this.TotalMilliseconds, length);
 	}
 
 	/**
@@ -409,19 +413,23 @@ export class ElapsedTime {
 		let resolvedOptions = { ...options };
 
 		// Handle predefined formats
+		const FORMAT_ALIASES: Record<string, string> = {
+			mostsignificant: 'mostSignificant',
+			timewithseconds: 'timeWithSeconds',
+		};
+		let formatKey = '';
 		if (typeof format === 'string') {
-			let normalizedFormat = format.toLowerCase().replace(/_/g, '');
-			if (normalizedFormat === 'mostsignificant') normalizedFormat = 'mostSignificant';
-			if (normalizedFormat === 'timewithseconds') normalizedFormat = 'timeWithSeconds';
-			if (normalizedFormat in FORMATS) {
-				resolvedOptions = { ...FORMATS[normalizedFormat as keyof typeof FORMATS], ...options };
+			const stripped = format.toLowerCase().replace(/_/g, '');
+			formatKey = FORMAT_ALIASES[stripped] ?? stripped;
+			if (formatKey in FORMATS) {
+				resolvedOptions = { ...FORMATS[formatKey as keyof typeof FORMATS], ...options };
 			}
 		}
 
 		const appliedOptions = ApplyDefaultOptions(resolvedOptions);
 
-		// Special case for LONG format which needs special handling
-		if (typeof format === 'string' && format.toLowerCase() === 'long') {
+		// Special case for LONG format which needs pluralization
+		if (formatKey === 'long') {
 			return this._FormatLong(appliedOptions);
 		}
 
@@ -571,7 +579,7 @@ export class ElapsedTime {
 	 * @private
 	 */
 	private static _FormatStandardUnits(units: ITimeUnitValue[], unitLabels: NonNullable<ITimeElapsedFormatOptions['unitLabels']>): string {
-		// Handle LONG format with pluralization
+		// Function-based labels: invoke each label function with the value (e.g. pluralization)
 		if (Object.values(unitLabels).some((label) => typeof label === 'function')) {
 			return units.map(({ unit, value }) => {
 				const labelFunc = unitLabels[unit];
@@ -721,8 +729,14 @@ export class ElapsedTime {
  */
 export function FormatElapsedTime(milliseconds: number, options?: IFormatConfig): string {
 	const elapsedTime = new ElapsedTime(milliseconds);
-	return elapsedTime.Format('concise', {
-		maxUnits: options?.maxUnits,
-		unitLabels: options?.unitLabels,
-	});
+	// Build options object from only the defined fields so we don't accidentally
+	// override the 'concise' format's default unitLabels with undefined.
+	const formatOptions: Partial<ITimeElapsedFormatOptions> = {};
+	if (options?.maxUnits !== undefined) {
+		formatOptions.maxUnits = options.maxUnits;
+	}
+	if (options?.unitLabels !== undefined) {
+		formatOptions.unitLabels = options.unitLabels;
+	}
+	return elapsedTime.Format('concise', formatOptions);
 }
