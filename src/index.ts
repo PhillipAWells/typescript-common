@@ -72,16 +72,23 @@ export {
 export {
 	// String utilities
 	CamelCase,
+	CAPITALIZE,
 	PASCAL_CASE,
 	KEBAB_CASE,
 	SNAKE_CASE,
 	SCREAMING_SNAKE_CASE,
 	FormatString,
+	TruncateString,
+	PadString,
 	EscapeHTML,
 	StripHTML,
 	Pluralize,
 	WordCount,
 	CountOccurrences,
+	REVERSE_STRING,
+	SLUGIFY,
+	IS_BLANK_STRING,
+	IS_HEX_STRING,
 } from './string/index.js';
 
 export {
