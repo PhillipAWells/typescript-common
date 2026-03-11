@@ -105,6 +105,7 @@ import { ArrayChunk, ObjectPick, CamelCase, Sleep, AssertString, LRUCache } from
 | `ObjectFlatten(obj, separator?)` | Flatten nested object to dot-separated keys |
 | `ObjectDiff(objA, objB)` | Compute added/removed/changed keys between two objects |
 | `ObjectHasCircularReference(obj)` | Detect circular references in an object |
+| `CreateJsonCircularReplacer(placeholder?)` | Create a `JSON.stringify` replacer that handles circular refs |
 | `AssertObjectHasProperty(value, property, exception?)` | Assert object has an inherited or own property |
 | `AssertObjectHasOwnProperty(value, property, exception?)` | Assert object has a direct own property |
 | `AssertObjectPropertyNotNull(value, property, exception?)` | Assert object property is not null/undefined |
