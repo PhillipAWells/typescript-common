@@ -1,5 +1,5 @@
 import { ObjectEquals } from './equals.js';
-import { isPropertyPathSafe } from './security-utils.js';
+import { isPropertyKeySafe, isPropertyPathSafe } from './security-utils.js';
 import type { IObjectFilterOptions, TPropertyFilter } from './types.js';
 
 /**
@@ -14,6 +14,10 @@ function objectGetValueByPath(object: any, path: string): any {
 	let current: any = object;
 
 	for (const segment of pathSegments) {
+		// Block prototype-pollution paths (__proto__, constructor, prototype, etc.)
+		if (!isPropertyKeySafe(segment)) {
+			return undefined;
+		}
 		current = current?.[segment];
 		if (current === undefined || current === null) {
 			return undefined;
