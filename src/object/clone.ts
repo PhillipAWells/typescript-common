@@ -45,12 +45,18 @@ export function ObjectClone<T>(obj: T, visitedInput?: WeakSet<object>): T {
 
 	// Handle Date
 	if (obj instanceof Date) {
-		return new Date(obj.getTime()) as unknown as T;
+		const result = new Date(obj.getTime()) as unknown as T;
+		// Backtrack so the same Date object can be cloned independently from
+		// a different path without being flagged as circular.
+		visited.delete(obj);
+		return result;
 	}
 
 	// Handle Array
 	if (Array.isArray(obj)) {
-		return obj.map((item) => ObjectClone(item, visited)) as unknown as T;
+		const result = obj.map((item) => ObjectClone(item, visited)) as unknown as T;
+		visited.delete(obj); // Backtrack for the same reason as Date above.
+		return result;
 	}
 
 	// Handle plain objects only
@@ -58,12 +64,11 @@ export function ObjectClone<T>(obj: T, visitedInput?: WeakSet<object>): T {
 		// Security: Filter out dangerous keys
 		const safeObj = filterDangerousKeys(obj as Record<string, any>);
 		const copy: Record<string, unknown> = {};
-		Object.keys(safeObj).forEach((key) => {
-			// Only process own properties
-			if (Object.prototype.hasOwnProperty.call(safeObj, key)) {
-				copy[key] = ObjectClone(safeObj[key], visited);
-			}
-		});
+		// Object.keys() returns only own enumerable properties — no further guard needed.
+		for (const key of Object.keys(safeObj)) {
+			copy[key] = ObjectClone(safeObj[key], visited);
+		}
+		visited.delete(obj); // Backtrack for the same reason as Date above.
 		return copy as T;
 	}
 
