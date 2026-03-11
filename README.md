@@ -31,11 +31,12 @@ import {
 
 ArrayUtils.ArrayChunk([1, 2, 3, 4], 2); // [[1, 2], [3, 4]]
 ArrayUtils.AssertArray(value);           // throws if not an array
+ObjectUtils.IsObject(value);             // returns true/false (type-guard)
 BooleanUtils.AssertBoolean(value);       // throws if not a boolean
 NumberUtils.AssertNumber(value, { gte: 0, integer: true });
 
 // Direct named import (tree-shakeable)
-import { ArrayChunk, ObjectPick, CamelCase, Sleep, AssertString } from '@pawells/typescript-common';
+import { ArrayChunk, ObjectPick, CamelCase, Sleep, AssertString, LRUCache } from '@pawells/typescript-common';
 ```
 
 ## API
@@ -82,15 +83,17 @@ import { ArrayChunk, ObjectPick, CamelCase, Sleep, AssertString } from '@pawells
 
 | Export | Description |
 |--------|-------------|
-| `AssertObject(value)` | Assert a value is a non-null plain object (type-guard, returns boolean) |
+| `IsObject(value)` | Type-guard: returns `true` if value is a non-null, non-array object |
 | `ObjectClone(obj)` | Deep-clone an object |
 | `ObjectEquals(a, b)` | Deep equality check |
 | `ObjectFilter(obj, predicate)` | Filter object entries by predicate |
+| `ObjectFilterCached(obj, predicate)` | Cached filter for repeated operations |
 | `FilterObject(obj, keys)` | Keep only specified keys |
 | `ObjectPick(obj, keys)` | Pick a subset of keys |
 | `ObjectOmit(obj, keys)` | Omit specified keys |
 | `ObjectMerge(target, ...sources)` | Deep merge objects |
 | `MapObject(obj, fn)` | Map over object values |
+| `MapObjectCached(obj, fn)` | Cached map for repeated operations |
 | `TransformObject(obj, fn)` | Transform object entries |
 | `ObjectHash(obj)` | Compute a stable hash of an object |
 | `ObjectSortKeys(obj)` | Return object with keys sorted |
@@ -101,6 +104,7 @@ import { ArrayChunk, ObjectPick, CamelCase, Sleep, AssertString } from '@pawells
 | `ObjectInvert(obj)` | Swap keys and values |
 | `ObjectFlatten(obj, separator?)` | Flatten nested object to dot-separated keys |
 | `ObjectDiff(objA, objB)` | Compute added/removed/changed keys between two objects |
+| `ObjectHasCircularReference(obj)` | Detect circular references in an object |
 | `AssertObjectHasProperty(value, property, exception?)` | Assert object has an inherited or own property |
 | `AssertObjectHasOwnProperty(value, property, exception?)` | Assert object has a direct own property |
 | `AssertObjectPropertyNotNull(value, property, exception?)` | Assert object property is not null/undefined |
@@ -110,16 +114,23 @@ import { ArrayChunk, ObjectPick, CamelCase, Sleep, AssertString } from '@pawells
 | Export | Description |
 |--------|-------------|
 | `CamelCase(str)` | Convert a string to camelCase |
+| `CAPITALIZE(str)` | Capitalize the first letter of a string |
 | `PASCAL_CASE(str)` | Convert a string to PascalCase |
 | `KEBAB_CASE(str)` | Convert a string to kebab-case |
 | `SNAKE_CASE(str)` | Convert a string to snake_case |
 | `SCREAMING_SNAKE_CASE(str)` | Convert a string to SCREAMING_SNAKE_CASE |
 | `FormatString(template, values)` | Simple string template formatting |
+| `TruncateString(str, maxLength, ellipsis?)` | Truncate a string with ellipsis |
+| `PadString(str, length, char?, padEnd?)` | Pad a string to a specified length |
 | `EscapeHTML(str)` | Escape HTML special characters |
 | `StripHTML(str)` | Remove all HTML tags from a string |
 | `Pluralize(word, count, plural?)` | Return singular or plural form based on count |
 | `WordCount(str)` | Count the number of words in a string |
 | `CountOccurrences(str, substr)` | Count non-overlapping occurrences of a substring |
+| `REVERSE_STRING(str)` | Reverse a string |
+| `SLUGIFY(str)` | Convert a string to a URL-friendly slug |
+| `IS_BLANK_STRING(str)` | Check if a string is empty or whitespace-only |
+| `IS_HEX_STRING(str)` | Check if a string is a valid hexadecimal value |
 | `AssertString(value, exception?)` | Assert value is a string primitive |
 | `AssertStringNotEmpty(value, exception?)` | Assert value is a non-empty, non-whitespace string |
 | `AssertStringMatches(value, regex, exception?)` | Assert string matches a regular expression |
@@ -128,7 +139,8 @@ import { ArrayChunk, ObjectPick, CamelCase, Sleep, AssertString } from '@pawells
 
 | Export | Description |
 |--------|-------------|
-| `ElapsedTime` | Measure elapsed time with human-readable output |
+| `ElapsedTime` | Class for measuring elapsed time with human-readable output |
+| `FormatElapsedTime(ms, options?)` | Format milliseconds using concise format |
 | `Stopwatch` | Lap-based stopwatch for benchmarking |
 
 ### Enum utilities — `EnumUtils`
@@ -154,6 +166,20 @@ import { ArrayChunk, ObjectPick, CamelCase, Sleep, AssertString } from '@pawells
 | `Compose(...fns)` | Compose functions right-to-left |
 | `Sleep(ms)` | Return a `Promise` that resolves after `ms` ms |
 
+### LRU Cache — `LRUCache`
+
+| Export | Description |
+|--------|-------------|
+| `LRUCache<K, V>` | Generic Least Recently Used cache with configurable capacity |
+
+```typescript
+const cache = new LRUCache<string, number>(100);
+cache.set('key', 42);
+cache.get('key'); // 42 (marks as recently used)
+cache.has('key'); // true
+cache.clear();    // removes all entries
+```
+
 ### Assertion utilities — `AssertsUtils`
 
 Cross-cutting assertions not tied to a single type, plus the shared assertion infrastructure.
@@ -176,7 +202,7 @@ Cross-cutting assertions not tied to a single type, plus the shared assertion in
 
 **All type-specific assertions** (`AssertArray`, `AssertBoolean`, `AssertNumber`, `AssertObject` (throwing), `AssertString`, etc.) are also accessible through `AssertsUtils` as a single convenience namespace.
 
-**Note:** `AssertsUtils.AssertObject` is the throwing assertion (narrows to `Record<string, unknown>`). `ObjectUtils.AssertObject` is the boolean predicate (returns `true`/`false`).
+**Note:** `AssertObject` is a throwing assertion (narrows to `Record<string, unknown>`). Use `ObjectUtils.IsObject` for a boolean type-guard that returns `true`/`false`.
 
 #### Error classes
 
