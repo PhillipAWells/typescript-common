@@ -1,31 +1,7 @@
 import { ObjectEquals } from './equals.js';
-import { isPropertyKeySafe, isPropertyPathSafe } from './security-utils.js';
+import { isPropertyPathSafe } from './security-utils.js';
+import { ObjectGetPropertyByPath } from './property-paths.js';
 import type { IObjectFilterOptions, TPropertyFilter } from './types.js';
-
-/**
- * Navigates to a nested property value using dot notation path
- *
- * @param object - The object to navigate
- * @param path - The dot notation path (e.g., 'meta.details.category')
- * @returns The value at the path, or undefined if path doesn't exist
- */
-function objectGetValueByPath(object: any, path: string): any {
-	const pathSegments = path.split('.');
-	let current: any = object;
-
-	for (const segment of pathSegments) {
-		// Block prototype-pollution paths (__proto__, constructor, prototype, etc.)
-		if (!isPropertyKeySafe(segment)) {
-			return undefined;
-		}
-		current = current?.[segment];
-		if (current === undefined || current === null) {
-			return undefined;
-		}
-	}
-
-	return current;
-}
 
 /**
  * Compares two objects using deep equality logic for ObjectFilter
@@ -200,7 +176,7 @@ export function ObjectFilter<T>(object: T, filter: Record<string, any>, options:
 				return false;
 			}
 
-			const objValue = objectGetValueByPath(object, key);
+			const objValue = ObjectGetPropertyByPath(object, key);
 			if (objValue === undefined) {
 				return false;
 			}
