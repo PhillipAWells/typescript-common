@@ -1,4 +1,28 @@
 /**
+ * Lightweight base for simple assertion error classes.
+ *
+ * Handles the two boilerplate steps that every Error subclass needs:
+ * - Restoring the correct prototype chain (required when the runtime's built-in
+ *   Error constructor replaces `this`, as in some transpiled environments).
+ * - Setting `this.name` to the concrete class name so stack traces are readable.
+ *
+ * Subclasses only need to supply their default message:
+ * ```typescript
+ * class MyError extends SimpleError {
+ *   constructor(message?: string) { super(message ?? 'My default message'); }
+ * }
+ * ```
+ */
+export class SimpleError extends Error {
+	constructor(message: string) {
+		super(message);
+		// Fix prototype chain before reading this.constructor.name.
+		Object.setPrototypeOf(this, new.target.prototype);
+		this.name = this.constructor.name;
+	}
+}
+
+/**
  * Base error class for all custom errors in the assertion library.
  *
  * Extends the built-in `Error` with a machine-readable `Code` string and an

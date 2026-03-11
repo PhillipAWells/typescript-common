@@ -1,18 +1,27 @@
 import type { IAssertException } from '../asserts/types.js';
 import { SetExceptionClass, SetExceptionMessage, ThrowException } from '../asserts/utils.js';
+import { SimpleError } from '../asserts/errors.js';
 
 /**
- * Type alias for size constraint properties.
- * Represents constraints that can be applied to array dimensions.
+ * Configuration interface for array validation constraints.
+ *
+ * Provides flexible size constraints for array validation, allowing
+ * exact size matching or range-based validation with min/max bounds.
+ * All size constraints are inclusive.
  */
-export type TSizeConstraint = {
-	/** Exact size requirement */
+export interface IAssertArrayArgs {
+	/** Exact number of elements the array must contain */
 	size?: number;
-	/** Minimum size requirement (inclusive) */
+	/** Minimum number of elements the array must contain (inclusive) */
 	minSize?: number;
-	/** Maximum size requirement (inclusive) */
+	/** Maximum number of elements the array must contain (inclusive) */
 	maxSize?: number;
-};
+}
+
+/**
+ * Alias for {@link IAssertArrayArgs}. Kept for backwards compatibility.
+ */
+export type TSizeConstraint = IAssertArrayArgs;
 
 /**
  * Type alias for 2D dimension constraint properties.
@@ -33,28 +42,8 @@ export type TDimensionConstraint = {
  * @example
  * throw new ArrayError('Value is not a valid array');
  */
-export class ArrayError extends Error {
-	constructor(message?: string) {
-		super(message ?? 'Array assertion failed');
-		this.name = 'ArrayError';
-		Object.setPrototypeOf(this, ArrayError.prototype);
-	}
-}
-
-/**
- * Configuration interface for array validation constraints.
- *
- * Provides flexible size constraints for array validation, allowing
- * exact size matching or range-based validation with min/max bounds.
- * All size constraints are inclusive.
- */
-export interface IAssertArrayArgs {
-	/** Exact number of elements the array must contain */
-	size?: number;
-	/** Minimum number of elements the array must contain (inclusive) */
-	minSize?: number;
-	/** Maximum number of elements the array must contain (inclusive) */
-	maxSize?: number;
+export class ArrayError extends SimpleError {
+	constructor(message?: string) { super(message ?? 'Array assertion failed'); }
 }
 
 /**
@@ -87,9 +76,8 @@ export interface IAssertArray2DArgs {
  * @param exception Optional custom exception to throw.
  * @throws {ArrayError} If the value is not an array or fails size validation.
  */
-export function AssertArray<T = unknown>(value: unknown, args?: IAssertArrayArgs, exceptionInput: IAssertException = {}): asserts value is T[] {
+export function AssertArray<T = unknown>(value: unknown, args?: IAssertArrayArgs, exception: IAssertException = {}): asserts value is T[] {
 	// Initialize exception configuration with defaults
-	const exception = exceptionInput ?? {};
 	SetExceptionClass(exception, ArrayError);
 
 	// Validate that the value is an array
@@ -222,6 +210,15 @@ export function AssertArrayNotEmpty<T>(value: T[] | unknown, exception: IAssertE
 	}
 }
 
+/** Shared guard for predicate-based array assertions. */
+function assertIsArray<T>(array: T[], exception: IAssertException): void {
+	SetExceptionClass(exception, ArrayError);
+	if (!Array.isArray(array)) {
+		SetExceptionMessage(exception, 'Value is not an array');
+		ThrowException(exception);
+	}
+}
+
 /**
  * Asserts that all elements in an array satisfy a predicate.
  * @template T The type of array elements.
@@ -231,16 +228,7 @@ export function AssertArrayNotEmpty<T>(value: T[] | unknown, exception: IAssertE
  * @throws {ArrayError} If any element fails the predicate test.
  */
 export function AssertArrayAll<T>(array: T[], predicate: (el: T, idx: number, arr: T[]) => boolean, exception: IAssertException = {}): void {
-	// Initialize exception configuration with defaults
-	SetExceptionClass(exception, ArrayError);
-
-	// Validate that the value is an array
-	if (!Array.isArray(array)) {
-		SetExceptionMessage(exception, 'Value is not an array');
-		ThrowException(exception);
-	}
-
-	// Check if all elements satisfy the predicate
+	assertIsArray(array, exception);
 	if (!array.every(predicate)) {
 		SetExceptionMessage(exception, 'Not all elements satisfy the predicate condition');
 		ThrowException(exception);
@@ -256,16 +244,7 @@ export function AssertArrayAll<T>(array: T[], predicate: (el: T, idx: number, ar
  * @throws {ArrayError} If no elements pass the predicate test.
  */
 export function AssertArrayAny<T>(array: T[], predicate: (el: T, idx: number, arr: T[]) => boolean, exception: IAssertException = {}): void {
-	// Initialize exception configuration with defaults
-	SetExceptionClass(exception, ArrayError);
-
-	// Validate that the value is an array
-	if (!Array.isArray(array)) {
-		SetExceptionMessage(exception, 'Value is not an array');
-		ThrowException(exception);
-	}
-
-	// Check if any elements satisfy the predicate
+	assertIsArray(array, exception);
 	if (!array.some(predicate)) {
 		SetExceptionMessage(exception, 'No elements satisfy the predicate condition');
 		ThrowException(exception);

@@ -1,5 +1,6 @@
 import type { IAssertException } from '../asserts/types.js';
 import { SetExceptionClass, SetExceptionMessage, ThrowException } from '../asserts/utils.js';
+import { SimpleError } from '../asserts/errors.js';
 
 /**
  * Cache for compiled regex patterns to improve performance when the same patterns are used repeatedly.
@@ -57,12 +58,8 @@ function getCachedRegex(source: string, flags: string = ''): RegExp {
  * @example
  * throw new StringError('Value is not a valid string');
  */
-export class StringError extends Error {
-	constructor(message?: string) {
-		super(message ?? 'String Assertion Failed');
-		this.name = 'StringError';
-		Object.setPrototypeOf(this, StringError.prototype);
-	}
+export class StringError extends SimpleError {
+	constructor(message?: string) { super(message ?? 'String Assertion Failed'); }
 }
 
 /**

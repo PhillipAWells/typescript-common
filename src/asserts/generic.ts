@@ -1,6 +1,7 @@
 import { ObjectEquals } from './internal-utils.js';
 import type { IAssertException, TGuard, TValidationPredicate } from './types.js';
 import { SetExceptionClass, SetExceptionMessage, ThrowException } from './utils.js';
+import { SimpleError } from './errors.js';
 
 /** Maximum number of characters to include from a value in an error message. */
 const MAX_VALUE_DISPLAY_LENGTH = 50;
@@ -19,12 +20,8 @@ export type TConstructorFunction<T = any> = new (...args: any[]) => T;
  * @example
  * throw new NullError('Expected value to be null or undefined');
  */
-export class NullError extends Error {
-	constructor(message?: string) {
-		super(message ?? 'Value is not null or undefined.');
-		this.name = 'NullError';
-		Object.setPrototypeOf(this, NullError.prototype);
-	}
+export class NullError extends SimpleError {
+	constructor(message?: string) { super(message ?? 'Value is not null or undefined.'); }
 }
 
 /**
@@ -35,12 +32,8 @@ export class NullError extends Error {
  * @example
  * throw new NotNullError('Expected a non-null value but received null');
  */
-export class NotNullError extends Error {
-	constructor(message?: string) {
-		super(message ?? 'Value is null or undefined.');
-		this.name = 'NotNullError';
-		Object.setPrototypeOf(this, NotNullError.prototype);
-	}
+export class NotNullError extends SimpleError {
+	constructor(message?: string) { super(message ?? 'Value is null or undefined.'); }
 }
 
 /**
@@ -49,12 +42,8 @@ export class NotNullError extends Error {
  * @example
  * throw new PredicateError('Predicate assertion failed');
  */
-export class PredicateError extends Error {
-	constructor(message?: string) {
-		super(message ?? 'Value does not satisfy the predicate condition');
-		this.name = 'PredicateError';
-		Object.setPrototypeOf(this, PredicateError.prototype);
-	}
+export class PredicateError extends SimpleError {
+	constructor(message?: string) { super(message ?? 'Value does not satisfy the predicate condition'); }
 }
 
 /**
@@ -63,12 +52,8 @@ export class PredicateError extends Error {
  * @example
  * throw new TypeGuardError('Value does not conform to the required type');
  */
-export class TypeGuardError extends Error {
-	constructor(message?: string) {
-		super(message ?? 'Type guard assertion failed');
-		this.name = 'TypeGuardError';
-		Object.setPrototypeOf(this, TypeGuardError.prototype);
-	}
+export class TypeGuardError extends SimpleError {
+	constructor(message?: string) { super(message ?? 'Type guard assertion failed'); }
 }
 
 /**
@@ -77,12 +62,8 @@ export class TypeGuardError extends Error {
  * @example
  * throw new InstanceOfError('Value is not an instance of the expected type');
  */
-export class InstanceOfError extends Error {
-	constructor(message?: string) {
-		super(message ?? 'InstanceOf assertion failed');
-		this.name = 'InstanceOfError';
-		Object.setPrototypeOf(this, InstanceOfError.prototype);
-	}
+export class InstanceOfError extends SimpleError {
+	constructor(message?: string) { super(message ?? 'InstanceOf assertion failed'); }
 }
 
 /**
@@ -91,12 +72,8 @@ export class InstanceOfError extends Error {
  * @example
  * throw new FunctionError('Value is not a function');
  */
-export class FunctionError extends Error {
-	constructor(message?: string) {
-		super(message ?? 'Function assertion failed');
-		this.name = 'FunctionError';
-		Object.setPrototypeOf(this, FunctionError.prototype);
-	}
+export class FunctionError extends SimpleError {
+	constructor(message?: string) { super(message ?? 'Function assertion failed'); }
 }
 
 /**
@@ -105,12 +82,8 @@ export class FunctionError extends Error {
  * @example
  * throw new SymbolError('Value is not a symbol');
  */
-export class SymbolError extends Error {
-	constructor(message?: string) {
-		super(message ?? 'Symbol assertion failed');
-		this.name = 'SymbolError';
-		Object.setPrototypeOf(this, SymbolError.prototype);
-	}
+export class SymbolError extends SimpleError {
+	constructor(message?: string) { super(message ?? 'Symbol assertion failed'); }
 }
 
 /**
@@ -119,12 +92,8 @@ export class SymbolError extends Error {
  * @example
  * throw new ExtendsError('Class does not extend the expected base class');
  */
-export class ExtendsError extends Error {
-	constructor(message?: string) {
-		super(message ?? 'Extends assertion failed');
-		this.name = 'ExtendsError';
-		Object.setPrototypeOf(this, ExtendsError.prototype);
-	}
+export class ExtendsError extends SimpleError {
+	constructor(message?: string) { super(message ?? 'Extends assertion failed'); }
 }
 
 /**

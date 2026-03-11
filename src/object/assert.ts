@@ -1,5 +1,6 @@
 import { IAssertException } from '../asserts/types.js';
 import { SetExceptionClass, SetExceptionMessage, ThrowException } from '../asserts/utils.js';
+import { SimpleError } from '../asserts/errors.js';
 
 /** Maximum number of characters to include from a value in an error message. */
 const MAX_VALUE_DISPLAY_LENGTH = 100;
@@ -10,12 +11,8 @@ const MAX_VALUE_DISPLAY_LENGTH = 100;
  * @example
  * throw new ObjectError('Value is not a valid object');
  */
-export class ObjectError extends Error {
-	constructor(message?: string) {
-		super(message ?? 'Object assertion failed');
-		this.name = 'ObjectError';
-		Object.setPrototypeOf(this, ObjectError.prototype);
-	}
+export class ObjectError extends SimpleError {
+	constructor(message?: string) { super(message ?? 'Object assertion failed'); }
 }
 
 /**
@@ -24,12 +21,8 @@ export class ObjectError extends Error {
  * @example
  * throw new PropertyError('Object is missing required property');
  */
-export class ObjectPropertyError extends Error {
-	constructor(message?: string) {
-		super(message ?? 'Object Property Assertion Failed');
-		this.name = 'ObjectPropertyError';
-		Object.setPrototypeOf(this, ObjectPropertyError.prototype);
-	}
+export class ObjectPropertyError extends SimpleError {
+	constructor(message?: string) { super(message ?? 'Object Property Assertion Failed'); }
 }
 
 /**
@@ -131,7 +124,7 @@ export function AssertObjectHasProperty<T extends object, K extends PropertyKey>
  *
  * This method validates that the specified property exists as an own property
  * of the object, excluding properties from the prototype chain. Uses
- * Object.prototype.hasOwnProperty.call() for reliable detection. This is useful
+ * `Object.hasOwn()` for reliable detection. This is useful
  * when you need to ensure a property is directly defined on the object.
  *
  * @template T - The object type
@@ -162,7 +155,7 @@ export function AssertObjectHasOwnProperty<T extends object, K extends PropertyK
 
 	// Then check for own property existence, using the configured exception class or default
 	SetExceptionClass(exception, ObjectPropertyError);
-	if (!Object.prototype.hasOwnProperty.call(value, property)) {
+	if (!Object.hasOwn(value as Record<PropertyKey, unknown>, property)) {
 		SetExceptionMessage(exception, `Expected object to have own property '${String(property)}' but property was not found`);
 		ThrowException(exception);
 	}

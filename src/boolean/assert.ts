@@ -1,5 +1,6 @@
 import type { IAssertException } from '../asserts/types.js';
 import { SetExceptionClass, SetExceptionMessage, ThrowException } from '../asserts/utils.js';
+import { SimpleError } from '../asserts/errors.js';
 
 /**
  * Error thrown when a value is not a valid boolean or fails a boolean assertion.
@@ -7,12 +8,8 @@ import { SetExceptionClass, SetExceptionMessage, ThrowException } from '../asser
  * @example
  * throw new BooleanError('Value is not a valid boolean');
  */
-export class BooleanError extends Error {
-	constructor(message?: string) {
-		super(message ?? 'Invalid Boolean');
-		this.name = 'BooleanError';
-		Object.setPrototypeOf(this, BooleanError.prototype);
-	}
+export class BooleanError extends SimpleError {
+	constructor(message?: string) { super(message ?? 'Invalid Boolean'); }
 }
 
 /**
