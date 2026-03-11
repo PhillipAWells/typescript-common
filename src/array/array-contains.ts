@@ -1,4 +1,4 @@
-import type { TPredicate } from './types';
+import type { TPredicate } from './types.js';
 
 /**
  * Checks if an array contains at least one element that passes a predicate test.

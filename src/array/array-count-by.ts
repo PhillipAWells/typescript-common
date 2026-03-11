@@ -1,4 +1,4 @@
-import type { TTransform } from './types';
+import type { TTransform } from './types.js';
 
 /**
  * Counts how many elements fall into each group defined by `keyFn`.

@@ -1,3 +1,5 @@
+import { ObjectEquals } from './equals.js';
+
 /** Describes the differences between two objects at the top level. */
 export interface IObjectDiffResult {
 	/** Keys present in `objB` but not in `objA`. */
@@ -17,14 +19,10 @@ export interface IObjectDiffResult {
  * - **changed** — keys present in both whose values are not strictly equal
  *   (compared via `JSON.stringify` for deep value equality)
  *
- * **Important**: Value comparison uses `JSON.stringify`, which has limitations:
- * - Functions, `undefined`, and `Symbol` values are not compared correctly
- *   (they may serialize to `undefined` or be omitted)
- * - Circular references will throw an error
- * - Objects with identical structure but different prototypes are considered equal
- *
- * For values containing functions, `undefined`, symbols, or circular references,
- * consider a custom comparison function or pre-filtering the objects.
+ * **Important**: Comparison is performed with deep equality (`ObjectEquals`),
+ * which correctly handles nested objects regardless of key insertion order,
+ * Dates, RegExps, and NaN. Functions, Symbols, and circular references are
+ * not supported (see `ObjectEquals` for details).
  *
  * @param objA - The baseline object ("before")
  * @param objB - The comparison object ("after")
@@ -51,14 +49,14 @@ export function ObjectDiff(
 	const allKeys = new Set([...Object.keys(objA), ...Object.keys(objB)]);
 
 	for (const key of allKeys) {
-		const inA = Object.prototype.hasOwnProperty.call(objA, key);
-		const inB = Object.prototype.hasOwnProperty.call(objB, key);
+		const inA = Object.hasOwn(objA, key);
+		const inB = Object.hasOwn(objB, key);
 
 		if (inA && !inB) {
 			result.removed[key] = objA[key];
 		} else if (!inA && inB) {
 			result.added[key] = objB[key];
-		} else if (JSON.stringify(objA[key]) !== JSON.stringify(objB[key])) {
+		} else if (!ObjectEquals(objA[key], objB[key])) {
 			result.changed[key] = { from: objA[key], to: objB[key] };
 		}
 	}

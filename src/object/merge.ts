@@ -31,12 +31,8 @@ export function ObjectMerge<T extends object = object>(target: T, source: Partia
 	const safeSource = filterDangerousKeys(source as Record<string, any>);
 
 	const output = { ...target };
-	Object.keys(safeSource).forEach((key) => {
-		// Additional safety check - only process own properties
-		if (!Object.prototype.hasOwnProperty.call(safeSource, key)) {
-			return;
-		}
-
+	// Object.keys() returns only own enumerable properties — no further guard needed.
+	for (const key of Object.keys(safeSource)) {
 		const targetValue = (output as Record<string, any>)[key];
 		const sourceValue = safeSource[key];
 
@@ -49,7 +45,7 @@ export function ObjectMerge<T extends object = object>(target: T, source: Partia
 		} else {
 			(output as Record<string, any>)[key] = sourceValue;
 		}
-	});
+	}
 
 	return output as T;
 }

@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { ElapsedTime } from './elapsed-time/elapsed-time.js';
+import { ElapsedTime, FormatElapsedTime } from './elapsed-time/elapsed-time.js';
+import { DEFAULT_UNIT_LABELS } from './elapsed-time/constants.js';
 import { Stopwatch } from './stopwatch/stopwatch.js';
+import { StopwatchEntry } from './stopwatch/entry.js';
 
 // ----- ElapsedTime -----
 
@@ -243,5 +245,237 @@ describe('Stopwatch', () => {
 			now = 9000;
 			expect(sw.Elapsed.TotalMilliseconds).toBe(2000);
 		});
+	});
+});
+
+// ----- StopwatchEntry -----
+
+describe('StopwatchEntry', () => {
+	let now: number;
+
+	beforeEach(() => {
+		now = 1000;
+		vi.spyOn(Date, 'now').mockImplementation(() => now);
+	});
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
+	it('exposes the correct timestamp', () => {
+		const sw = new Stopwatch(true);
+		const entry = sw.First!;
+		expect(entry.timestamp).toBe(1000);
+	});
+
+	it('Elapsed returns 0 for the first entry (no predecessor)', () => {
+		const sw = new Stopwatch(true);
+		expect(sw.First!.Elapsed.TotalMilliseconds).toBe(0);
+	});
+
+	it('Elapsed returns the interval since the previous entry', () => {
+		const sw = new Stopwatch(true); // entry 0 at t=1000
+		now = 1500;
+		sw.Lap(); // entry 1 at t=1500
+		// Latest is entry 1; predecessor is entry 0 → 1500 - 1000 = 500
+		expect(sw.Latest!.Elapsed.TotalMilliseconds).toBe(500);
+	});
+
+	it('ElapsedTotal returns 0 for a standalone entry with no stopwatch', () => {
+		const standalone = new StopwatchEntry(9999);
+		expect(standalone.ElapsedTotal.TotalMilliseconds).toBe(0);
+	});
+
+	it('ElapsedTotal returns 0 when stopwatch has no recorded entries', () => {
+		const sw = new Stopwatch();
+		// Manually construct an entry that references an empty-ish stopwatch
+		// (can't happen through the normal API, but StopwatchEntry is public)
+		const entry = new StopwatchEntry(2000, sw, 0);
+		expect(entry.ElapsedTotal.TotalMilliseconds).toBe(0);
+	});
+
+	it('ElapsedTotal returns total time from first entry to this entry', () => {
+		const sw = new Stopwatch(true); // entry 0 at t=1000
+		now = 2000;
+		sw.Lap(); // entry 1 at t=2000
+		now = 3500;
+		sw.Stop(); // entry 2 at t=3500
+		// Latest (Stop entry) ElapsedTotal = 3500 - 1000 = 2500
+		expect(sw.Latest!.ElapsedTotal.TotalMilliseconds).toBe(2500);
+	});
+
+	it('Elapsed returns 0 for a standalone entry with no stopwatch', () => {
+		const standalone = new StopwatchEntry(5000);
+		expect(standalone.Elapsed.TotalMilliseconds).toBe(0);
+	});
+});
+
+// ----- ElapsedTime: padded helpers and negative formatting -----
+
+describe('ElapsedTime (extended)', () => {
+	it('HoursPadded returns zero-padded hours string', () => {
+		const et = new ElapsedTime(3661000); // 1h 1m 1s
+		expect(et.HoursPadded()).toBe('01');
+		expect(et.HoursPadded(3)).toBe('001');
+	});
+
+	it('MinutesPadded returns zero-padded minutes string', () => {
+		const et = new ElapsedTime(3661000);
+		expect(et.MinutesPadded()).toBe('01');
+	});
+
+	it('SecondsPadded returns zero-padded seconds string', () => {
+		const et = new ElapsedTime(3661000);
+		expect(et.SecondsPadded()).toBe('01');
+	});
+
+	it('MillisecondsPadded returns zero-padded milliseconds string', () => {
+		const et = new ElapsedTime(3661500); // …500ms
+		expect(et.MillisecondsPadded()).toBe('500');
+	});
+
+	it('TotalHoursPadded returns total hours zero-padded', () => {
+		const et = new ElapsedTime(90000000); // 25 hours
+		expect(et.TotalHoursPadded()).toBe('25');
+	});
+
+	it('TotalMinutesPadded returns total minutes zero-padded', () => {
+		const et = new ElapsedTime(600000); // 10 minutes
+		expect(et.TotalMinutesPadded()).toBe('10');
+	});
+
+	it('TotalSecondsPadded returns total seconds zero-padded', () => {
+		const et = new ElapsedTime(65000); // 65 seconds
+		expect(et.TotalSecondsPadded()).toBe('65');
+	});
+
+	it('TotalMillisecondsPadded pads shorter values', () => {
+		const et = new ElapsedTime(5);
+		expect(et.TotalMillisecondsPadded(6)).toBe('000005');
+	});
+
+	it('TotalMilliseconds setter resets cached values', () => {
+		const et = new ElapsedTime(1000);
+		expect(et.Seconds).toBe(1);
+		et.TotalMilliseconds = 2000;
+		expect(et.TotalMilliseconds).toBe(2000);
+		expect(et.Seconds).toBe(2);
+	});
+
+	it('TotalMilliseconds setter handles negative values', () => {
+		const et = new ElapsedTime(1000);
+		et.TotalMilliseconds = -3000;
+		expect(et.IsNegative).toBe(true);
+		expect(et.TotalMilliseconds).toBe(3000);
+	});
+
+	it('Format with negativeValueFormat NegativeSign prepends minus', () => {
+		const et = new ElapsedTime(-5000);
+		const result = et.Format('concise', { negativeValueFormat: 'NegativeSign' });
+		expect(result.startsWith('-')).toBe(true);
+	});
+
+	it('Format with negativeValueFormat Parenthesis wraps in parentheses', () => {
+		const et = new ElapsedTime(-5000);
+		const result = et.Format('concise', { negativeValueFormat: 'Parenthesis' });
+		expect(result.startsWith('(')).toBe(true);
+		expect(result.endsWith(')')).toBe(true);
+	});
+
+	it('Format with negativeValueFormat Brackets wraps in brackets', () => {
+		const et = new ElapsedTime(-5000);
+		const result = et.Format('concise', { negativeValueFormat: 'Brackets' });
+		expect(result.startsWith('[')).toBe(true);
+		expect(result.endsWith(']')).toBe(true);
+	});
+
+	it('Format showZeroValues includes all units', () => {
+		const et = new ElapsedTime(1000); // 1 second, 0 ms
+		const result = et.Format('concise', { showZeroValues: true });
+		expect(result).toContain('0ms');
+	});
+
+	it('Weeks and Days properties decompose correctly', () => {
+		const et = new ElapsedTime(9 * 24 * 3600 * 1000); // 9 days = 1 week + 2 days
+		expect(et.Weeks).toBe(1);
+		expect(et.Days).toBe(2);
+		expect(et.TotalDays).toBe(9);
+	});
+
+	it('Format LONG includes negative long formatting', () => {
+		const et = new ElapsedTime(-3662000); // ~1h 1m 2s
+		const result = et.Format('long', { negativeValueFormat: 'NegativeSign' });
+		expect(result.startsWith('-')).toBe(true);
+		expect(result).toContain('hour');
+	});
+
+	it('Format short style produces abbreviated units', () => {
+		const et = new ElapsedTime(3665000); // 1h 1m 5s
+		const result = et.Format('short');
+		expect(result).toContain('hr');
+		expect(result).toContain('min');
+	});
+
+	it('Format medium style includes space-separated units', () => {
+		const et = new ElapsedTime(3665000);
+		const result = et.Format('medium');
+		expect(result).toContain('hour');
+		expect(result).toContain('min');
+	});
+
+	it('Format mostSignificant limits to 2 units', () => {
+		const et = new ElapsedTime(3665500); // 1h 1m 5s 500ms
+		const result = et.Format('mostSignificant');
+		const parts = result.split(' ');
+		// Each unit takes up 2 tokens ("1 hour", "1 min") → 4 tokens max
+		expect(parts.length).toBeLessThanOrEqual(4);
+	});
+});
+
+// ----- FormatElapsedTime standalone -----
+
+describe('FormatElapsedTime', () => {
+	it('formats milliseconds in concise style', () => {
+		const result = FormatElapsedTime(3661000); // 1h 1m 1s
+		expect(result).toContain('h');
+		expect(result).toContain('m');
+	});
+
+	it('respects maxUnits option', () => {
+		const result = FormatElapsedTime(3661000, { maxUnits: 1 });
+		// concise format + maxUnits:1 → only the most significant unit, e.g. "1h"
+		expect(result).toMatch(/^\d+h$/);
+	});
+
+	it('accepts custom unitLabels', () => {
+		const result = FormatElapsedTime(3600000, { unitLabels: { hour: 'hr', minute: 'min', second: 'sec', millisecond: 'ms', day: 'd', week: 'wk' } });
+		expect(result).toContain('hr');
+	});
+});
+
+// ----- DEFAULT_UNIT_LABELS.long lambda coverage -----
+
+describe('DEFAULT_UNIT_LABELS.long', () => {
+	it('produces singular labels for value 1', () => {
+		// Pass DEFAULT_UNIT_LABELS.long as custom unitLabels to a non-long format
+		// so _FormatUsingTokens calls the lambda functions.
+		const et = new ElapsedTime(7 * 24 * 3600 * 1000 + 24 * 3600 * 1000 + 3600 * 1000 + 60 * 1000 + 1000); // 1w 1d 1h 1m 1s
+		const result = et.Format('concise', { unitLabels: DEFAULT_UNIT_LABELS.long });
+		expect(result).toContain('week');
+		expect(result).toContain('day');
+		expect(result).toContain('hour');
+		expect(result).toContain('minute');
+		expect(result).toContain('second');
+	});
+
+	it('produces plural labels for values > 1', () => {
+		const et = new ElapsedTime(2 * 7 * 24 * 3600 * 1000 + 2 * 24 * 3600 * 1000 + 2 * 3600 * 1000 + 2 * 60 * 1000 + 2 * 1000 + 2);
+		const result = et.Format('concise', { unitLabels: DEFAULT_UNIT_LABELS.long });
+		expect(result).toContain('weeks');
+		expect(result).toContain('days');
+		expect(result).toContain('hours');
+		expect(result).toContain('minutes');
+		expect(result).toContain('seconds');
+		expect(result).toContain('milliseconds');
 	});
 });

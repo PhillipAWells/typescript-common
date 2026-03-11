@@ -23,7 +23,7 @@ export { ObjectFromKeyValuePairs, ObjectToKeyValuePairs } from './key-value-pair
 export { ObjectPick } from './pick.js';
 export { ObjectOmit } from './omit.js';
 export { ObjectMerge } from './merge.js';
-export { AssertObject } from './assert-object.js';
+export { IsObject } from './assert-object.js';
 export { isPropertyKeySafe, isPropertyPathSafe, sanitizePropertyKey, filterDangerousKeys, createCircularReferenceDetector, isInputSafe } from './security-utils.js';
 export { ObjectInvert } from './object-invert.js';
 export { ObjectFlatten } from './object-flatten.js';

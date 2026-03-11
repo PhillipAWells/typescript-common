@@ -1,5 +1,6 @@
 import type { IAssertException } from '../asserts/types.js';
 import { SetExceptionClass, SetExceptionMessage, ThrowException } from '../asserts/utils.js';
+import { SimpleError } from '../asserts/errors.js';
 
 /**
  * Error thrown when a value is not a valid number or fails basic numeric validation.
@@ -15,11 +16,9 @@ import { SetExceptionClass, SetExceptionMessage, ThrowException } from '../asser
  * throw new NumberError('Expected number but received string');
  * ```
  */
-export class NumberError extends Error {
+export class NumberError extends SimpleError {
 	constructor(message?: string) {
 		super(message ?? 'Value is not a valid number');
-		this.name = 'NumberError';
-		Object.setPrototypeOf(this, NumberError.prototype);
 	}
 }
 
@@ -42,8 +41,6 @@ export class NumberError extends Error {
 export class NumberRangeError extends NumberError {
 	constructor(message?: string) {
 		super(message ?? 'Value is not in the expected range');
-		this.name = 'NumberRangeError';
-		Object.setPrototypeOf(this, NumberRangeError.prototype);
 	}
 }
 

@@ -21,8 +21,7 @@
 			"DOM"
 		],
 		"types": [
-			"vitest/globals",
-			"node"
+			"vitest/globals"
 		]
 	},
 	"include": [

@@ -66,13 +66,32 @@ export class LRUCache<K, V> {
 	 * ```
 	 */
 	public get(key: K): V | undefined {
-		const value = this._map.get(key);
-		if (value !== undefined) {
-			// Move to end (mark as recently used)
-			this._map.delete(key);
-			this._map.set(key, value);
+		if (!this._map.has(key)) {
+			return undefined;
 		}
+		const value = this._map.get(key) as V;
+		// Move to end (mark as recently used)
+		this._map.delete(key);
+		this._map.set(key, value);
 		return value;
+	}
+
+	/**
+	 * Returns whether a key exists in the cache.
+	 *
+	 * @param key - The key to check
+	 * @returns `true` if the key is present, `false` otherwise
+	 *
+	 * @example
+	 * ```typescript
+	 * const cache = new LRUCache<string, number>(2);
+	 * cache.set('a', 1);
+	 * console.log(cache.has('a')); // true
+	 * console.log(cache.has('b')); // false
+	 * ```
+	 */
+	public has(key: K): boolean {
+		return this._map.has(key);
 	}
 
 	/**

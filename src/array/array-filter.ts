@@ -1,4 +1,4 @@
-import type { TPredicate } from './types';
+import type { TPredicate } from './types.js';
 
 /**
  * Gets nested property value from an object using dot notation
@@ -12,6 +12,8 @@ function getNestedValue(obj: unknown, path: string): unknown {
 
 	for (const key of keys) {
 		if (current === null || current === undefined) return undefined;
+		// Block prototype-pollution paths
+		if (key === '__proto__' || key === 'constructor' || key === 'prototype') return undefined;
 		current = current[key];
 	}
 
@@ -72,6 +74,8 @@ export function ArrayFilter<T>(
 	array: T[],
 	criteria: Partial<Record<string, unknown>> | TPredicate<T>,
 ): T[] {
+	if (!array) return [];
+
 	// If criteria is a function, use it as predicate
 	if (typeof criteria === 'function') {
 		return array.filter(criteria);

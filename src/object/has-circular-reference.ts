@@ -38,6 +38,9 @@ export function ObjectHasCircularReference(obj: unknown): boolean {
 				}
 			}
 
+			// Backtrack: remove from seen so shared (non-circular) references are not
+			// falsely flagged when the same object appears via a different path.
+			seen.delete(value);
 			return false;
 		}
 
@@ -50,6 +53,8 @@ export function ObjectHasCircularReference(obj: unknown): boolean {
 			}
 		}
 
+		// Backtrack: same reason as the array case above.
+		seen.delete(value);
 		return false;
 	};
 

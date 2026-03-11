@@ -138,8 +138,8 @@ export interface IDefaultUnitLabels {
 export interface IFormatConfig {
 	/** Maximum number of units to display */
 	maxUnits?: number;
-	/** Unit labels to use for formatting */
-	unitLabels: Partial<IUnitLabelMap>;
+	/** Unit labels to use for formatting. When omitted, the format's default labels are used. */
+	unitLabels?: Partial<IUnitLabelMap>;
 }
 
 /**

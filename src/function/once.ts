@@ -16,11 +16,22 @@
 export function Once<T extends (...args: any[]) => any>(fn: T): T {
 	let called = false;
 	let result: ReturnType<T>;
+	let error: unknown;
+	let hasError = false;
 
 	return function once(...args: Parameters<T>): ReturnType<T> {
+		if (hasError) {
+			throw error;
+		}
 		if (!called) {
-			called = true;
-			result = fn(...args) as ReturnType<T>;
+			try {
+				result = fn(...args) as ReturnType<T>;
+				called = true;
+			} catch (e) {
+				error = e;
+				hasError = true;
+				throw e;
+			}
 		}
 		return result;
 	} as T;

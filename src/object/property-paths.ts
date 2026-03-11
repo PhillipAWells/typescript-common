@@ -78,8 +78,8 @@ export function ObjectGetPropertyByPath<T = any>(obj: any, path: string, default
 			return defaultValue;
 		}
 
-		// Use Object.hasOwnProperty to prevent prototype chain access
-		if (!Object.prototype.hasOwnProperty.call(result, key)) {
+		// Use Object.hasOwn to prevent prototype chain access
+		if (!Object.hasOwn(result as Record<string, unknown>, key)) {
 			return defaultValue;
 		}
 

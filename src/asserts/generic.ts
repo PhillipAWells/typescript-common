@@ -1,6 +1,7 @@
 import { ObjectEquals } from './internal-utils.js';
 import type { IAssertException, TGuard, TValidationPredicate } from './types.js';
 import { SetExceptionClass, SetExceptionMessage, ThrowException } from './utils.js';
+import { AssertionError, SimpleError } from './errors.js';
 
 /** Maximum number of characters to include from a value in an error message. */
 const MAX_VALUE_DISPLAY_LENGTH = 50;
@@ -19,11 +20,9 @@ export type TConstructorFunction<T = any> = new (...args: any[]) => T;
  * @example
  * throw new NullError('Expected value to be null or undefined');
  */
-export class NullError extends Error {
+export class NullError extends SimpleError {
 	constructor(message?: string) {
 		super(message ?? 'Value is not null or undefined.');
-		this.name = 'NullError';
-		Object.setPrototypeOf(this, NullError.prototype);
 	}
 }
 
@@ -35,11 +34,9 @@ export class NullError extends Error {
  * @example
  * throw new NotNullError('Expected a non-null value but received null');
  */
-export class NotNullError extends Error {
+export class NotNullError extends SimpleError {
 	constructor(message?: string) {
 		super(message ?? 'Value is null or undefined.');
-		this.name = 'NotNullError';
-		Object.setPrototypeOf(this, NotNullError.prototype);
 	}
 }
 
@@ -49,11 +46,9 @@ export class NotNullError extends Error {
  * @example
  * throw new PredicateError('Predicate assertion failed');
  */
-export class PredicateError extends Error {
+export class PredicateError extends SimpleError {
 	constructor(message?: string) {
 		super(message ?? 'Value does not satisfy the predicate condition');
-		this.name = 'PredicateError';
-		Object.setPrototypeOf(this, PredicateError.prototype);
 	}
 }
 
@@ -63,11 +58,9 @@ export class PredicateError extends Error {
  * @example
  * throw new TypeGuardError('Value does not conform to the required type');
  */
-export class TypeGuardError extends Error {
+export class TypeGuardError extends SimpleError {
 	constructor(message?: string) {
 		super(message ?? 'Type guard assertion failed');
-		this.name = 'TypeGuardError';
-		Object.setPrototypeOf(this, TypeGuardError.prototype);
 	}
 }
 
@@ -77,11 +70,9 @@ export class TypeGuardError extends Error {
  * @example
  * throw new InstanceOfError('Value is not an instance of the expected type');
  */
-export class InstanceOfError extends Error {
+export class InstanceOfError extends SimpleError {
 	constructor(message?: string) {
 		super(message ?? 'InstanceOf assertion failed');
-		this.name = 'InstanceOfError';
-		Object.setPrototypeOf(this, InstanceOfError.prototype);
 	}
 }
 
@@ -91,11 +82,9 @@ export class InstanceOfError extends Error {
  * @example
  * throw new FunctionError('Value is not a function');
  */
-export class FunctionError extends Error {
+export class FunctionError extends SimpleError {
 	constructor(message?: string) {
 		super(message ?? 'Function assertion failed');
-		this.name = 'FunctionError';
-		Object.setPrototypeOf(this, FunctionError.prototype);
 	}
 }
 
@@ -105,11 +94,9 @@ export class FunctionError extends Error {
  * @example
  * throw new SymbolError('Value is not a symbol');
  */
-export class SymbolError extends Error {
+export class SymbolError extends SimpleError {
 	constructor(message?: string) {
 		super(message ?? 'Symbol assertion failed');
-		this.name = 'SymbolError';
-		Object.setPrototypeOf(this, SymbolError.prototype);
 	}
 }
 
@@ -119,11 +106,9 @@ export class SymbolError extends Error {
  * @example
  * throw new ExtendsError('Class does not extend the expected base class');
  */
-export class ExtendsError extends Error {
+export class ExtendsError extends SimpleError {
 	constructor(message?: string) {
 		super(message ?? 'Extends assertion failed');
-		this.name = 'ExtendsError';
-		Object.setPrototypeOf(this, ExtendsError.prototype);
 	}
 }
 
@@ -147,8 +132,7 @@ export class ExtendsError extends Error {
  * @param expected - The expected value that the actual value should equal
  * @param exception - Configuration object for custom error handling and messaging.
  *                   Allows customization of error type, message, and additional metadata
- * @throws {PropertyError} When values are not deeply equal, with descriptive error message
- * @throws {TError} When custom exception type is specified and values don't match
+ * @throws {AssertionError} When values are not deeply equal, with descriptive error message
  *
  * @example
  * ```typescript
@@ -173,9 +157,9 @@ export class ExtendsError extends Error {
  * AssertEquals(obj1, obj2);                         // ✓ Valid (deeply equal)
  *
  * // Failure cases
- * AssertEquals(5, 10);                              // ✗ Throws PropertyError
- * AssertEquals({a: 1}, {a: 2});                     // ✗ Throws PropertyError
- * AssertEquals([1, 2], [1, 2, 3]);                  // ✗ Throws PropertyError
+ * AssertEquals(5, 10);                              // ✗ Throws AssertionError
+ * AssertEquals({a: 1}, {a: 2});                     // ✗ Throws AssertionError
+ * AssertEquals([1, 2], [1, 2, 3]);                  // ✗ Throws AssertionError
  *
  * // Custom exception handling
  * AssertEquals(1, 2, {
@@ -184,6 +168,7 @@ export class ExtendsError extends Error {
  * ```
  */
 export function AssertEquals<T>(value: T, expected: T, exception: IAssertException = {}): void {
+	SetExceptionClass(exception, AssertionError);
 	if (!ObjectEquals(value, expected)) {
 		SetExceptionMessage(exception, `Expected ${value} to equal ${expected}`);
 		ThrowException(exception);
@@ -213,8 +198,7 @@ export function AssertEquals<T>(value: T, expected: T, exception: IAssertExcepti
  * @param expected - The value that should NOT be equal to the actual value
  * @param exception - Configuration object for custom error handling and messaging.
  *                   Defaults to empty object if not provided, allowing for optional customization
- * @throws {PropertyError} When values are deeply equal (and shouldn't be), with descriptive error message
- * @throws {TError} When custom exception type is specified and values are unexpectedly equal
+ * @throws {AssertionError} When values are deeply equal (and shouldn't be), with descriptive error message
  *
  * @example
  * ```typescript
@@ -245,9 +229,9 @@ export function AssertEquals<T>(value: T, expected: T, exception: IAssertExcepti
  * AssertNotEquals(counter, initialState);           // ✓ Valid (state changed)
  *
  * // Failure cases (when values are unexpectedly equal)
- * AssertNotEquals(5, 5);                            // ✗ Throws PropertyError
- * AssertNotEquals([1, 2], [1, 2]);                  // ✗ Throws PropertyError
- * AssertNotEquals({a: 1}, {a: 1});                  // ✗ Throws PropertyError
+ * AssertNotEquals(5, 5);                            // ✗ Throws AssertionError
+ * AssertNotEquals([1, 2], [1, 2]);                  // ✗ Throws AssertionError
+ * AssertNotEquals({a: 1}, {a: 1});                  // ✗ Throws AssertionError
  *
  * // Custom exception handling
  * AssertNotEquals(1, 1, {
@@ -256,6 +240,7 @@ export function AssertEquals<T>(value: T, expected: T, exception: IAssertExcepti
  * ```
  */
 export function AssertNotEquals<T>(value: T, expected: T, exception: IAssertException = {}): void {
+	SetExceptionClass(exception, AssertionError);
 	if (ObjectEquals(value, expected)) {
 		SetExceptionMessage(exception, `Expected ${value} to not equal ${expected}`);
 		ThrowException(exception);
@@ -292,7 +277,7 @@ export function AssertNotEquals<T>(value: T, expected: T, exception: IAssertExce
  * }
  * ```
  */
-export function AssertNull<T>(value: T, exception: IAssertException = {}): void {
+export function AssertNull<T>(value: T, exception: IAssertException = {}): asserts value is T & (null | undefined) {
 	SetExceptionClass(exception, NullError);
 	if (value !== null && value !== undefined) {
 		SetExceptionMessage(exception, `Expected null or undefined but received ${typeof value}: ${JSON.stringify(value)}`);
@@ -332,7 +317,7 @@ export function AssertNull<T>(value: T, exception: IAssertException = {}): void 
  * }
  * ```
  */
-export function AssertNotNull<T>(value: T, exception: IAssertException = {}): asserts value is T {
+export function AssertNotNull<T>(value: T, exception: IAssertException = {}): asserts value is NonNullable<T> {
 	SetExceptionClass(exception, NotNullError);
 	if (value === null || value === undefined) {
 		const actualValue = value === null ? 'null' : 'undefined';
