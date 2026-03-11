@@ -19,8 +19,10 @@ export function Throttle<T extends (...args: any[]) => any>(
 ): (...args: Parameters<T>) => void {
 	let lastCall = 0;
 	let timer: ReturnType<typeof setTimeout> | undefined;
+	let latestArgs: Parameters<T>;
 
 	return function throttled(...args: Parameters<T>): void {
+		latestArgs = args;
 		const now = Date.now();
 		const remaining = ms - (now - lastCall);
 
@@ -28,12 +30,12 @@ export function Throttle<T extends (...args: any[]) => any>(
 			clearTimeout(timer);
 			timer = undefined;
 			lastCall = now;
-			fn(...args);
+			fn(...latestArgs);
 		} else {
 			timer ??= setTimeout(() => {
 				lastCall = Date.now();
 				timer = undefined;
-				fn(...args);
+				fn(...latestArgs);
 			}, remaining);
 		}
 	};
