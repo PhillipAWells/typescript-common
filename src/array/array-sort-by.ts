@@ -1,4 +1,4 @@
-import type { TTransform } from './types';
+import type { TTransform } from './types.js';
 
 /**
  * Returns a new array sorted by the value produced by `keyFn`, without mutating the original.

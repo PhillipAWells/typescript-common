@@ -1,4 +1,4 @@
-import type { TEqualityComparator } from './types';
+import type { TEqualityComparator } from './types.js';
 
 /**
  * Returns the intersection of two arrays (elements present in both)

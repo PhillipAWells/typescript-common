@@ -1,4 +1,4 @@
-import type { TEqualityComparator } from './types';
+import type { TEqualityComparator } from './types.js';
 
 /**
  * Returns elements present in the first array but not in the second (set difference).

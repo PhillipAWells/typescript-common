@@ -1,4 +1,4 @@
-import type { TPredicate } from './types';
+import type { TPredicate } from './types.js';
 
 /**
  * Splits an array into two groups: elements that satisfy the predicate and those that do not.

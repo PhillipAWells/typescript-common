@@ -1,4 +1,4 @@
-import type { TPredicate } from './types';
+import type { TPredicate } from './types.js';
 
 /**
  * Gets nested property value from an object using dot notation
