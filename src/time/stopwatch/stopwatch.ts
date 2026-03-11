@@ -122,8 +122,7 @@ export class Stopwatch {
 		const current = Date.now();
 		if (!this.Latest) return new ElapsedTime(0);
 
-		const first = this.First;
-		if (!first) return new ElapsedTime(0);
+		const first = this.First!;
 
 		if (this._pausedAt !== null) {
 			return new ElapsedTime(this._pausedAt - first.timestamp);
@@ -218,7 +217,7 @@ export class Stopwatch {
 			this._times.push(entry);
 			return entry;
 		} else {
-			// Already stopped, just return latest
+			// Already paused or stopped — return latest unchanged (idempotent)
 			return latest;
 		}
 	}
