@@ -30,8 +30,8 @@ export class BaseError extends Error {
 		this.name = this.constructor.name;
 		this.Code = code;
 		this.Context = context;
-		if (typeof Error.captureStackTrace === 'function') {
-			Error.captureStackTrace(this, this.constructor);
+		if (typeof (Error as any).captureStackTrace === 'function') {
+			(Error as any).captureStackTrace(this, this.constructor);
 		}
 	}
 }
