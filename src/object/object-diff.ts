@@ -49,8 +49,8 @@ export function ObjectDiff(
 	const allKeys = new Set([...Object.keys(objA), ...Object.keys(objB)]);
 
 	for (const key of allKeys) {
-		const inA = Object.prototype.hasOwnProperty.call(objA, key);
-		const inB = Object.prototype.hasOwnProperty.call(objB, key);
+		const inA = Object.hasOwn(objA, key);
+		const inB = Object.hasOwn(objB, key);
 
 		if (inA && !inB) {
 			result.removed[key] = objA[key];

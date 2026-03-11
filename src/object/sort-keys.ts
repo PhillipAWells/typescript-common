@@ -44,7 +44,7 @@ export function ObjectSortKeys<T extends Record<string, any>>(object: T): T {
 	const allKeys = Object.getOwnPropertyNames(object);
 
 	for (const key of allKeys) {
-		if (!Object.prototype.hasOwnProperty.call(sorted, key)) {
+		if (!Object.hasOwn(sorted as Record<string, unknown>, key)) {
 			const descriptor = Object.getOwnPropertyDescriptor(object, key);
 			if (descriptor) {
 				Object.defineProperty(sorted, key, descriptor);
