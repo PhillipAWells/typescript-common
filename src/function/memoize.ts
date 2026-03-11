@@ -1,10 +1,13 @@
+import { LRUCache } from '../lru-cache.js';
+
 /**
  * Returns a memoized version of `fn` that caches results by serialising its
  * arguments with `JSON.stringify` (or a custom `keyFn`).
  *
  * Only suitable for **pure functions** with serialisable arguments.
  *
- * Implements LRU (Least Recently Used) eviction when the cache reaches `maxCacheSize`.
+ * Uses an LRU (Least Recently Used) eviction policy: when the cache reaches
+ * `maxCacheSize`, the entry that was accessed least recently is evicted.
  *
  * @template T - The wrapped function type
  * @param fn - The function to memoize
@@ -31,7 +34,7 @@ export function Memoize<T extends (...args: any[]) => any>(
 	// eslint-disable-next-line no-magic-numbers
 	maxCacheSize = 1000,
 ): T {
-	const cache = new Map<string, ReturnType<T>>();
+	const cache = new LRUCache<string, ReturnType<T>>(maxCacheSize);
 
 	return function memoized(...args: Parameters<T>): ReturnType<T> {
 		const key = keyFn ? keyFn(...args) : JSON.stringify(args);
@@ -41,13 +44,6 @@ export function Memoize<T extends (...args: any[]) => any>(
 		}
 
 		const result = fn(...args) as ReturnType<T>;
-
-		// Implement LRU eviction: if cache is full, remove oldest entry before adding new one
-		if (cache.size >= maxCacheSize) {
-			const oldestKey = cache.keys().next().value as string;
-			cache.delete(oldestKey);
-		}
-
 		cache.set(key, result);
 		return result;
 	} as T;
