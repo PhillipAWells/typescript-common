@@ -4,7 +4,7 @@ import { SetExceptionClass, SetExceptionMessage, ThrowException } from './utils.
 import { AssertionError, SimpleError } from './errors.js';
 
 /** Maximum number of characters to include from a value in an error message. */
-const MAX_VALUE_DISPLAY_LENGTH = 50;
+const MAX_VALUE_DISPLAY_LENGTH = 100;
 
 /** Serialises a value to a human-readable string, safe for any value type. */
 function safeDisplay(value: unknown): string {
