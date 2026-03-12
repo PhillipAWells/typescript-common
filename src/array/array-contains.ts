@@ -14,7 +14,7 @@ import type { TPredicate } from './types.js';
  * ArrayContains([1, 2, 3], (n) => n > 10);  // false
  * ```
  */
-export function ArrayContains<T>(array: T[], predicate: TPredicate<T>): boolean {
+export function ArrayContains<T>(array: readonly T[], predicate: TPredicate<T>): boolean {
 	if (!array || array.length === 0) {
 		return false;
 	}

@@ -3,23 +3,26 @@
  *
  * @template T - The type of array elements
  * @param array - The array to shuffle
+ * @param random - Optional custom RNG function (returns number between 0 and 1). Defaults to `Math.random`.
  * @returns A new shuffled array (original is not mutated)
  *
- * @remarks Uses `Math.random()` — not cryptographically secure. Do not use for
+ * @remarks Uses `Math.random()` by default — not cryptographically secure. Do not use for
  * security-sensitive operations.
  *
  * @example
  * ```typescript
  * ArrayShuffle([1, 2, 3, 4, 5]); // e.g. [3, 1, 5, 2, 4]
+ * ArrayShuffle([1, 2, 3], () => 0.5); // deterministic with custom RNG
  * ```
  */
-export function ArrayShuffle<T>(array: T[]): T[] {
+export function ArrayShuffle<T>(array: readonly T[], random?: () => number): T[] {
 	if (array === null || array === undefined) return [];
 
+	const rng = random ?? Math.random;
 	const result = [...array];
 
 	for (let i = result.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
+		const j = Math.floor(rng() * (i + 1));
 		const temp = result[i];
 		result[i] = result[j] as T;
 		result[j] = temp as T;

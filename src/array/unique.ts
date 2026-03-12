@@ -14,7 +14,7 @@
  * Unique(['a', 'b', 'a']); // ['a', 'b']
  * ```
  */
-export function Unique<T>(array: T[]): T[] {
+export function Unique<T>(array: readonly T[]): T[] {
 	if (array === null || array === undefined) {
 		return [];
 	}

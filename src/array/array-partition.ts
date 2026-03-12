@@ -16,7 +16,7 @@ import type { TPredicate } from './types.js';
  * const [admins, users] = ArrayPartition(users, (u) => u.role === 'admin');
  * ```
  */
-export function ArrayPartition<T>(array: T[], predicate: TPredicate<T>): [T[], T[]] {
+export function ArrayPartition<T>(array: readonly T[], predicate: TPredicate<T>): [T[], T[]] {
 	if (array === null || array === undefined) return [[], []];
 
 	const matches: T[] = [];
