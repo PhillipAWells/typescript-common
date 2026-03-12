@@ -13,7 +13,7 @@
  * ObjectOmit(user, ['password']); // { id: 1, name: 'John' }
  * ```
  */
-export function ObjectOmit<T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> {
+export function ObjectOmit<T extends object, K extends keyof T>(obj: T, keys: readonly K[]): Omit<T, K> {
 	if (!obj) {
 		return {} as Omit<T, K>;
 	}

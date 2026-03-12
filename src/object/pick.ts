@@ -46,7 +46,7 @@
  * ObjectPick(undefined, ['name']); // Returns {}
  * ```
  */
-export function ObjectPick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
+export function ObjectPick<T extends object, K extends keyof T>(obj: T, keys: readonly K[]): Pick<T, K> {
 	if (!obj) {
 		return {} as Pick<T, K>;
 	}

@@ -11,7 +11,7 @@
  * ObjectFromKeyValuePairs([['a', 1], ['b', 2]]); // { a: 1, b: 2 }
  * ```
  */
-export function ObjectFromKeyValuePairs<T = unknown>(entries: [string, T][]): Record<string, T> {
+export function ObjectFromKeyValuePairs<T = unknown>(entries: readonly [string, T][]): Record<string, T> {
 	const obj = {} as Record<string, T>;
 	for (const [key, value] of entries) {
 		// Use defineProperty to bypass inherited setters (e.g. __proto__) and
