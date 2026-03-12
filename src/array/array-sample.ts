@@ -34,12 +34,14 @@ export function ArraySample<T>(array: readonly T[], n: number, random?: () => nu
 
 export function ArraySample<T>(array: readonly T[], n?: number | (() => number), random?: () => number): T | T[] | undefined {
 	// Handle overload where second argument is RNG function
-	let sampleCount: number | undefined = n;
+	let sampleCount: number | undefined;
 	let rng: () => number = random ?? Math.random;
 
 	if (typeof n === 'function') {
 		rng = n;
 		sampleCount = undefined;
+	} else {
+		sampleCount = n;
 	}
 
 	if (!array || array.length === 0) {
