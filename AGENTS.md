@@ -47,10 +47,10 @@ All source lives under `src/` and is compiled to `./build/` by `tsc`.
 
 ### Module directories
 
-Each type domain has its own directory under `src/` with a barrel `index.ts`:
+Each type domain has its own directory under `src/` with a barrel `index.ts`. One utility (`LRUCache`) is a standalone file rather than a directory module.
 
-| Directory | Namespace | Contents |
-|-----------|-----------|----------|
+| Directory / File | Namespace / Export | Contents |
+|------------------|-------------------|----------|
 | `src/array/` | `ArrayUtils` | Array helpers + array assertions (`assert.ts`) |
 | `src/boolean/` | `BooleanUtils` | Boolean assertions (`assert.ts`) |
 | `src/enum/` | `EnumUtils` | Enum introspection helpers |
@@ -60,6 +60,7 @@ Each type domain has its own directory under `src/` with a barrel `index.ts`:
 | `src/string/` | `StringUtils` | String helpers + string assertions (`assert.ts`) |
 | `src/time/` | `TimeUtils` | Stopwatch / elapsed-time helpers |
 | `src/asserts/` | `AssertsUtils` | Cross-cutting assertion infrastructure: generic asserts, shared types (`types.ts`), throwing utilities (`utils.ts`), base error classes (`errors.ts`), and internal helpers (`internal-utils.ts`). **Does not contain type-specific assertions** — those live in the module directories above. |
+| `src/lru-cache.ts` | `LRUCache` (direct export only) | Generic Least Recently Used cache with configurable capacity. Standalone file — not part of any namespace. |
 
 ### Assertions layout
 
@@ -74,6 +75,8 @@ The shared assertion plumbing (`IAssertException`, `ThrowException`, `SetExcepti
 **Adding a generic assertion**: implement it in `src/asserts/generic.ts` and export from `src/asserts/index.ts`.
 
 **Adding other utilities**: implement in `src/<module>/`, export from the module's `index.ts`, and re-export from `src/index.ts`.
+
+**Adding a standalone utility** (no natural module home): implement directly in `src/<name>.ts` and export it by name from `src/index.ts` (see `src/lru-cache.ts` as the existing example). Standalone files are not wrapped in a namespace.
 
 **No runtime dependencies**: Keep `dependencies` empty. All tooling belongs in `devDependencies`.
 
