@@ -1,4 +1,4 @@
-import type { TFormatParams, TFormatArgs } from './types';
+import type { TFormatParams, TFormatArgs } from './types.js';
 
 /**
  * Escapes a string for safe use in HTML by replacing special characters with

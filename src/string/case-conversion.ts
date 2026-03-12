@@ -1,4 +1,4 @@
-import type { TCaseConverter } from './types';
+import type { TCaseConverter } from './types.js';
 
 /**
  * Converts a string to camelCase.
