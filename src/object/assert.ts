@@ -94,19 +94,19 @@ export function AssertObject(value: unknown, exception: IAssertException = {}): 
  * @param value - The object to check for the property
  * @param property - The property key to check for
  * @param exception - Optional exception configuration for custom error handling
- * @throws {PropertyError} When object does not have the specified property
+ * @throws {ObjectPropertyError} When object does not have the specified property
  *
  * @example
  * ```typescript
  * const obj = { name: "John", age: 30 };
- * AssertHasProperty(obj, "name");           // ✓ Valid (own property)
- * AssertHasProperty(obj, "toString");       // ✓ Valid (inherited property)
- * AssertHasProperty(obj, "invalid");        // ✗ Throws PropertyError
+ * AssertObjectHasProperty(obj, "name");           // ✓ Valid (own property)
+ * AssertObjectHasProperty(obj, "toString");       // ✓ Valid (inherited property)
+ * AssertObjectHasProperty(obj, "invalid");        // ✗ Throws ObjectPropertyError
  *
  * // Type narrowing with property presence
  * function processUser(obj: unknown) {
  *   AssertObject(obj);
- *   AssertHasProperty(obj, "name");
+ *   AssertObjectHasProperty(obj, "name");
  *   // obj["name"] is now accessible safely
  * }
  * ```
@@ -137,19 +137,19 @@ export function AssertObjectHasProperty<T extends object, K extends PropertyKey>
  * @param value - The object to check for the own property
  * @param property - The property key to check for
  * @param exception - Optional exception configuration for custom error handling
- * @throws {PropertyError} When object does not have the specified own property
+ * @throws {ObjectPropertyError} When object does not have the specified own property
  *
  * @example
  * ```typescript
  * const obj = { name: "John" };
- * AssertHasOwnProperty(obj, "name");          // ✓ Valid (own property)
- * AssertHasOwnProperty(obj, "toString");      // ✗ Throws (inherited property)
- * AssertHasOwnProperty(obj, "invalid");       // ✗ Throws (doesn't exist)
+ * AssertObjectHasOwnProperty(obj, "name");          // ✓ Valid (own property)
+ * AssertObjectHasOwnProperty(obj, "toString");      // ✗ Throws (inherited property)
+ * AssertObjectHasOwnProperty(obj, "invalid");       // ✗ Throws (doesn't exist)
  *
  * // Checking for data vs inherited methods
  * function validateUserData(obj: object) {
- *   AssertHasOwnProperty(obj, "id");          // Must be own property
- *   AssertHasOwnProperty(obj, "name");        // Must be own property
+ *   AssertObjectHasOwnProperty(obj, "id");          // Must be own property
+ *   AssertObjectHasOwnProperty(obj, "name");        // Must be own property
  * }
  * ```
  */
@@ -178,18 +178,18 @@ export function AssertObjectHasOwnProperty<T extends object, K extends PropertyK
  * @param value - The object to check
  * @param property - The property key to validate for non-null value
  * @param exception - Optional exception configuration for custom error handling
- * @throws {PropertyError} When property is null, undefined, or doesn't exist
+ * @throws {ObjectPropertyError} When property is null, undefined, or doesn't exist
  *
  * @example
  * ```typescript
  * const user = { id: 123, name: "John", email: null };
- * AssertPropertyNotNull(user, "id");        // ✓ Valid (123 is not null/undefined)
- * AssertPropertyNotNull(user, "name");      // ✓ Valid ("John" is not null/undefined)
- * AssertPropertyNotNull(user, "email");     // ✗ Throws PropertyError (null)
+ * AssertObjectPropertyNotNull(user, "id");        // ✓ Valid (123 is not null/undefined)
+ * AssertObjectPropertyNotNull(user, "name");      // ✓ Valid ("John" is not null/undefined)
+ * AssertObjectPropertyNotNull(user, "email");     // ✗ Throws ObjectPropertyError (null)
  *
  * // Type narrowing for property values
  * function processUser(user: { name?: string | null }) {
- *   AssertPropertyNotNull(user, "name");
+ *   AssertObjectPropertyNotNull(user, "name");
  *   // user.name is now typed as string (null/undefined excluded)
  * }
  * ```
