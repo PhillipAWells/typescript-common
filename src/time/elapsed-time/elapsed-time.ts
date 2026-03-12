@@ -433,7 +433,7 @@ export class ElapsedTime {
 			return this._FormatLong(appliedOptions);
 		}
 
-		return this._FormatUsingTokens(appliedOptions);
+		return this._FormatUsingTokens(appliedOptions, formatKey);
 	}
 
 	/**
@@ -524,7 +524,7 @@ export class ElapsedTime {
 	 * // Called automatically by Format() method for most format types
 	 * ```
 	 */
-	private _FormatUsingTokens(options: ITimeElapsedFormatOptions): string {
+	private _FormatUsingTokens(options: ITimeElapsedFormatOptions, formatKey: string = ''): string {
 		// Define all available time units
 		const units: ITimeUnitValue[] = [
 			{ unit: 'week', value: this.Weeks },
@@ -539,11 +539,11 @@ export class ElapsedTime {
 		const filteredUnits = ElapsedTime._FilterAndLimitUnits(units, options);
 		const unitLabels = options.unitLabels ?? DEFAULT_UNIT_LABELS.medium;
 
-		// Determine the formatting approach based on unit labels
+		// Determine the formatting approach based on the resolved format key.
+		// TIME and TIME_WITH_SECONDS use a colon-separated layout; all other
+		// predefined and custom formats use the standard token layout.
 		let formatted: string;
-
-		// Check for time formats with colons (TIME, TIME_WITH_SECONDS)
-		const isTimeFormat = ElapsedTime._ValidateTimeFormat(unitLabels);
+		const isTimeFormat = formatKey === 'time' || formatKey === 'timeWithSeconds';
 		if (isTimeFormat) {
 			formatted = ElapsedTime._FormatTimeUnits(filteredUnits, unitLabels);
 		} else {
@@ -617,28 +617,6 @@ export class ElapsedTime {
 
 			return `${value} ${label}`;
 		}).join('').trim(); // Join without spaces and trim any trailing spaces
-	}
-
-	/**
-	 * Determine if the unit labels represent a time format with colons.
-	 * Analyzes the unit label configuration to detect TIME and TIME_WITH_SECONDS
-	 * formats which require special colon-separated formatting.
-	 *
-	 * @param unitLabels - The unit labels to analyze
-	 * @returns True if this is a colon-based time format, false for standard formats
-	 * @private
-	 *
-	 * @example
-	 * ```typescript
-	 * // Internal usage - distinguishes between:
-	 * // TIME format: "1:30" (colon-separated)
-	 * // CONCISE format: "1h 30m" (space-separated with labels)
-	 * ```
-	 */
-	private static _ValidateTimeFormat(unitLabels: NonNullable<ITimeElapsedFormatOptions['unitLabels']>): boolean {
-		return Boolean(unitLabels.hour && typeof unitLabels.hour === 'function' && unitLabels.minute && typeof unitLabels.minute === 'function' && (
-			String(unitLabels.hour).includes(':') || String(unitLabels.minute).includes('padStart')
-		));
 	}
 
 	/**
