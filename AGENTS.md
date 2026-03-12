@@ -70,6 +70,61 @@ The shared assertion plumbing (`IAssertException`, `ThrowException`, `SetExcepti
 
 ## Key Patterns
 
+### Readonly Array Support
+
+All array utilities accept `readonly T[]` to enable zero-copy usage with frozen/readonly arrays (e.g., `Object.freeze()`). Utilities that read-only their input should use `readonly T[]` in their signature:
+
+```typescript
+// Before: export function ArrayChunk<T>(array: T[], size: number): T[][]
+// After:
+export function ArrayChunk<T>(array: readonly T[], size: number): T[][] {
+  // Implementation unchanged - readonly is purely a type-safety improvement
+}
+```
+
+This pattern applies to: `ArrayChunk`, `ArrayContains`, `ArrayCountBy`, `ArrayDifference`, `ArrayIntersection`, `ArraySortBy`, `ArrayCompact`, `Unique`, `ArrayPartition`, `ArrayFilter`, `ArrayFlatten`, `ArrayGroupBy`, and object utilities like `ObjectPick`, `ObjectOmit`, `ObjectFromKeyValuePairs`.
+
+### Custom Dependency Injection (RNG Example)
+
+Functions that hard-code dependencies (like `Math.random()`) should accept an optional parameter to inject custom implementations. This enables testing and advanced use cases:
+
+```typescript
+// Before: ArrayShuffle uses hard-coded Math.random()
+// After:
+export function ArrayShuffle<T>(array: readonly T[], random?: () => number): T[] {
+  const rng = random ?? Math.random;
+  // Use rng() instead of Math.random()
+}
+
+// Usage:
+ArrayShuffle(arr); // Uses Math.random()
+ArrayShuffle(arr, seededRng); // Uses custom RNG for reproducible tests
+```
+
+Applied to: `ArraySample` and `ArrayShuffle`.
+
+### Predicate Function Support in Filters
+
+Filter functions that compare values should accept functions as filter values, treating them as predicates. This unlocks more flexible filtering without API multiplication:
+
+```typescript
+// ObjectFilter enhancement:
+function objectCompareValues(objValue: any, filterValue: any, ...): boolean {
+  // Handle function as predicate
+  if (typeof filterValue === 'function') {
+    return filterValue(objValue);
+  }
+  // ... existing comparison logic
+}
+
+// Usage:
+ObjectFilter(user, { age: (v) => v > 18 })
+```
+
+This pattern enriches: `ObjectFilter`.
+
+### Type-Specific Assertion Pattern
+
 **Adding a type-specific assertion**: implement it in `src/<module>/assert.ts`, ensure it's exported from `src/<module>/index.ts`, and add it to the named exports block in `src/index.ts`.
 
 **Adding a generic assertion**: implement it in `src/asserts/generic.ts` and export from `src/asserts/index.ts`.
