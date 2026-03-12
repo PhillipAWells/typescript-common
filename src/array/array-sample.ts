@@ -34,24 +34,25 @@ export function ArraySample<T>(array: readonly T[], n: number, random?: () => nu
 
 export function ArraySample<T>(array: readonly T[], n?: number | (() => number), random?: () => number): T | T[] | undefined {
 	// Handle overload where second argument is RNG function
-	if (typeof n === 'function') {
-		random = n;
-		n = undefined;
-	}
+	let sampleCount: number | undefined = n;
+	let rng: () => number = random ?? Math.random;
 
-	const rng = random ?? Math.random;
+	if (typeof n === 'function') {
+		rng = n;
+		sampleCount = undefined;
+	}
 
 	if (!array || array.length === 0) {
-		return n !== undefined ? [] : undefined;
+		return sampleCount !== undefined ? [] : undefined;
 	}
 
-	if (n === undefined) {
+	if (sampleCount === undefined) {
 		return array[Math.floor(rng() * array.length)];
 	}
 
 	// Fisher-Yates partial shuffle for O(n) sampling
 	const copy = [...array];
-	const count = Math.min(n, copy.length);
+	const count = Math.min(sampleCount, copy.length);
 
 	for (let i = 0; i < count; i++) {
 		const j = i + Math.floor(rng() * (copy.length - i));
