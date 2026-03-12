@@ -104,14 +104,14 @@ export function TruncateString(str: string, maxLength: number, ellipsis = '...')
  * @returns The padded string.
  */
 export function PadString(str: string, length: number, char = ' ', padEnd = true): string {
-	if (str && typeof str === 'string' && length > str.length) {
+	if (typeof str === 'string' && length > str.length) {
 		const paddingLength = length - str.length;
 		const padding = char.repeat(paddingLength);
 
 		return padEnd ? str + padding : padding + str;
 	}
 
-	return str || '';
+	return str ?? '';
 }
 
 /**

@@ -199,6 +199,12 @@ describe('PadString', () => {
 	it('returns empty string for null input', () => {
 		expect(PadString(null as any, 5)).toBe('');
 	});
+
+	it('pads an empty string', () => {
+		expect(PadString('', 3)).toBe('   ');
+		expect(PadString('', 3, '0')).toBe('000');
+		expect(PadString('', 3, '0', false)).toBe('000');
+	});
 });
 
 describe('REVERSE_STRING', () => {
