@@ -451,6 +451,15 @@ describe('FormatElapsedTime', () => {
 		const result = FormatElapsedTime(3600000, { unitLabels: { hour: 'hr', minute: 'min', second: 'sec', millisecond: 'ms', day: 'd', week: 'wk' } });
 		expect(result).toContain('hr');
 	});
+
+	it('separates multiple units with spaces when using custom string labels', () => {
+		// 3661000 ms = 1h 1m 1s — exercises the multi-unit custom-label path
+		const labels = { hour: 'hr', minute: 'min', second: 'sec', millisecond: 'ms', day: 'd', week: 'wk' };
+		const et = new ElapsedTime(3661000);
+		const result = et.Format('concise', { unitLabels: labels });
+		// Units must be separated by spaces, not merged together
+		expect(result).toMatch(/1 hr 1 min 1 sec/);
+	});
 });
 
 // ----- DEFAULT_UNIT_LABELS.long lambda coverage -----

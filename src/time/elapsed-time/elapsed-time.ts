@@ -600,23 +600,19 @@ export class ElapsedTime {
 			return units.map(({ unit, value }) => `${value} ${unitLabels[unit]}`).join(' ');
 		}
 
-		// Custom labels (including those with commas)
+		// Custom labels: join with a space so units are properly separated.
 		return units.map(({ unit, value }) => {
 			const label = unitLabels[unit];
 			if (typeof label === 'undefined') return '';
 
-			// For labels with built-in spaces or punctuation at the start
+			// Labels that begin with a space or punctuation already carry their
+			// own leading separator, so skip the extra space.
 			if (typeof label === 'string' && (label.startsWith(' ') || label.startsWith(','))) {
 				return `${value}${label}`;
 			}
 
-			// Handle special case for custom labels with commas - used in tests
-			if (typeof label === 'string' && label.trim().endsWith(',')) {
-				return `${value} ${label}`;
-			}
-
 			return `${value} ${label}`;
-		}).join('').trim(); // Join without spaces and trim any trailing spaces
+		}).join(' ');
 	}
 
 	/**
