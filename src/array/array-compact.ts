@@ -15,6 +15,6 @@
  * ```
  */
 export function ArrayCompact<T>(array: (T | null | undefined)[]): T[] {
-	if (!array) return [];
+	if (array === null || array === undefined) return [];
 	return array.filter((item): item is T => item !== null && item !== undefined);
 }

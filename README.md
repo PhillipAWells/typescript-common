@@ -106,6 +106,7 @@ import { ArrayChunk, ObjectPick, CamelCase, Sleep, AssertString, LRUCache } from
 | `ObjectDiff(objA, objB)` | Compute added/removed/changed keys between two objects |
 | `ObjectHasCircularReference(obj)` | Detect circular references in an object |
 | `CreateJsonCircularReplacer(placeholder?)` | Create a `JSON.stringify` replacer that handles circular refs |
+| `AssertObject(value, exception?)` | Assert value is a plain object (not null, array, or function), narrowing to `Record<string, unknown>` |
 | `AssertObjectHasProperty(value, property, exception?)` | Assert object has an inherited or own property |
 | `AssertObjectHasOwnProperty(value, property, exception?)` | Assert object has a direct own property |
 | `AssertObjectPropertyNotNull(value, property, exception?)` | Assert object property is not null/undefined |
@@ -203,7 +204,7 @@ Cross-cutting assertions not tied to a single type, plus the shared assertion in
 
 **All type-specific assertions** (`AssertArray`, `AssertBoolean`, `AssertNumber`, `AssertObject` (throwing), `AssertString`, etc.) are also accessible through `AssertsUtils` as a single convenience namespace.
 
-**Note:** `AssertObject` is a throwing assertion (narrows to `Record<string, unknown>`). Use `ObjectUtils.IsObject` for a boolean type-guard that returns `true`/`false`.
+**Note:** `AssertObject` is a throwing assertion available in both `ObjectUtils` and `AssertsUtils` (narrows to `Record<string, unknown>`). Use `ObjectUtils.IsObject` for a non-throwing boolean type-guard that returns `true`/`false`.
 
 #### Error classes
 

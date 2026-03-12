@@ -303,7 +303,7 @@ export class ElapsedTime {
 	 * // ... some operation that takes time ...
 	 * const end = Date.now();
 	 * const duration = ElapsedTime.From(start, end);
-	 * console.log(duration.Format('CONCISE')); // "1s 250ms"
+	 * console.log(duration.Format('concise')); // "1s 250ms"
 	 * ```
 	 *
 	 * @example
@@ -313,7 +313,7 @@ export class ElapsedTime {
 	 * await someAsyncOperation();
 	 * const end = performance.now();
 	 * const duration = ElapsedTime.From(start, end);
-	 * console.log(duration.Format('MEDIUM')); // "1 sec 250 ms"
+	 * console.log(duration.Format('medium')); // "1 sec 250 ms"
 	 * ```
 	 */
 	public static From(start: number, stop: number): ElapsedTime {
@@ -325,19 +325,19 @@ export class ElapsedTime {
 	 * Creates a temporary ElapsedTime instance and formats it in one operation.
 	 *
 	 * @param milliseconds - The total number of milliseconds to format
-	 * @param format - The format string or predefined format name (default: 'CONCISE')
+	 * @param format - The format string or predefined format name (default: `'concise'`)
 	 * @param options - Formatting options of type ITimeElapsedFormatOptions for customization
 	 * @returns The formatted time string
 	 *
 	 * @example
 	 * ```typescript
 	 * // Quick formatting without creating an instance
-	 * console.log(ElapsedTime.Format(3661000));           // "1h 1m 1s"
-	 * console.log(ElapsedTime.Format(3661000, 'LONG'));   // "1 hour 1 minute 1 second"
+	 * console.log(ElapsedTime.Format(3661000));            // "1h 1m 1s"
+	 * console.log(ElapsedTime.Format(3661000, 'long'));    // "1 hour 1 minute 1 second"
 	 *
 	 * // With custom options
 	 * const options = { maxUnits: 2, showZeroValues: false };
-	 * console.log(ElapsedTime.Format(3661000, 'MEDIUM', options)); // "1 hour 1 min"
+	 * console.log(ElapsedTime.Format(3661000, 'medium', options)); // "1 hour 1 min"
 	 * ```
 	 */
 	public static Format(milliseconds: number, format: TTimeElapsedFormats = 'concise', options: Partial<ITimeElapsedFormatOptions> = {}): string {
@@ -351,15 +351,15 @@ export class ElapsedTime {
 	 * and custom formatting configurations.
 	 *
 	 * Available predefined formats:
-	 * - **CONCISE**: "1h 30m 45s" - Ultra-compact with single-letter units
-	 * - **SHORT**: "1hr 30min 45sec" - Abbreviated but readable units
-	 * - **MEDIUM**: "1 hour 30 min 45 sec" - Balanced readability and length
-	 * - **LONG**: "1 hour 30 minutes 45 seconds" - Full words with proper pluralization
-	 * - **MOST_SIGNIFICANT**: Shows only the 2 most significant units
-	 * - **TIME**: "1:30" - Clock-style hours:minutes format
-	 * - **TIME_WITH_SECONDS**: "1:30:45" - Extended clock format with seconds
+	 * - **`'concise'`**: "1h 30m 45s" - Ultra-compact with single-letter units
+	 * - **`'short'`**: "1hr 30min 45sec" - Abbreviated but readable units
+	 * - **`'medium'`**: "1 hour 30 min 45 sec" - Balanced readability and length
+	 * - **`'long'`**: "1 hour 30 minutes 45 seconds" - Full words with proper pluralization
+	 * - **`'mostSignificant'`**: Shows only the 2 most significant units
+	 * - **`'time'`**: "1:30" - Clock-style hours:minutes format
+	 * - **`'timeWithSeconds'`**: "1:30:45" - Extended clock format with seconds
 	 *
-	 * @param format - The format string or predefined format name (default: 'CONCISE')
+	 * @param format - The format string or predefined format name (default: `'concise'`)
 	 * @param options - Formatting options of type ITimeElapsedFormatOptions for fine-tuned control
 	 * @returns The formatted time string
 	 *
@@ -368,12 +368,12 @@ export class ElapsedTime {
 	 * const elapsed = new ElapsedTime(5425000);  // 1h 30m 25s
 	 *
 	 * // Predefined formats
-	 * elapsed.Format('CONCISE');         // "1h 30m 25s"
-	 * elapsed.Format('SHORT');           // "1hr 30min 25sec"
-	 * elapsed.Format('MEDIUM');          // "1 hour 30 min 25 sec"
-	 * elapsed.Format('LONG');            // "1 hour 30 minutes 25 seconds"
-	 * elapsed.Format('TIME');            // "1:30"
-	 * elapsed.Format('TIME_WITH_SECONDS'); // "1:30:25"
+	 * elapsed.Format('concise');          // "1h 30m 25s"
+	 * elapsed.Format('short');            // "1hr 30min 25sec"
+	 * elapsed.Format('medium');           // "1 hour 30 min 25 sec"
+	 * elapsed.Format('long');             // "1 hour 30 minutes 25 seconds"
+	 * elapsed.Format('time');             // "1:30"
+	 * elapsed.Format('timeWithSeconds');  // "1:30:25"
 	 * ```
 	 *
 	 * @example
@@ -387,7 +387,7 @@ export class ElapsedTime {
 	 *   showZeroValues: false
 	 * };
 	 *
-	 * elapsed.Format('MEDIUM', options); // "(1 hour 30 min)"
+	 * elapsed.Format('medium', options); // "(1 hour 30 min)"
 	 * ```
 	 *
 	 * @example
@@ -403,7 +403,7 @@ export class ElapsedTime {
 	 *   }
 	 * };
 	 *
-	 * elapsed.Format('CUSTOM', customOptions); // "1 hrs 30 mins 25 secs"
+	 * elapsed.Format('concise', customOptions); // "1 hrs 30 mins 25 secs"
 	 * ```
 	 */
 	public Format(format: TTimeElapsedFormats = 'concise', options: Partial<ITimeElapsedFormatOptions> = {}): string {
@@ -433,7 +433,7 @@ export class ElapsedTime {
 			return this._FormatLong(appliedOptions);
 		}
 
-		return this._FormatUsingTokens(appliedOptions);
+		return this._FormatUsingTokens(appliedOptions, formatKey);
 	}
 
 	/**
@@ -524,7 +524,7 @@ export class ElapsedTime {
 	 * // Called automatically by Format() method for most format types
 	 * ```
 	 */
-	private _FormatUsingTokens(options: ITimeElapsedFormatOptions): string {
+	private _FormatUsingTokens(options: ITimeElapsedFormatOptions, formatKey: string = ''): string {
 		// Define all available time units
 		const units: ITimeUnitValue[] = [
 			{ unit: 'week', value: this.Weeks },
@@ -539,11 +539,11 @@ export class ElapsedTime {
 		const filteredUnits = ElapsedTime._FilterAndLimitUnits(units, options);
 		const unitLabels = options.unitLabels ?? DEFAULT_UNIT_LABELS.medium;
 
-		// Determine the formatting approach based on unit labels
+		// Determine the formatting approach based on the resolved format key.
+		// TIME and TIME_WITH_SECONDS use a colon-separated layout; all other
+		// predefined and custom formats use the standard token layout.
 		let formatted: string;
-
-		// Check for time formats with colons (TIME, TIME_WITH_SECONDS)
-		const isTimeFormat = ElapsedTime._ValidateTimeFormat(unitLabels);
+		const isTimeFormat = formatKey === 'time' || formatKey === 'timeWithSeconds';
 		if (isTimeFormat) {
 			formatted = ElapsedTime._FormatTimeUnits(filteredUnits, unitLabels);
 		} else {
@@ -600,45 +600,19 @@ export class ElapsedTime {
 			return units.map(({ unit, value }) => `${value} ${unitLabels[unit]}`).join(' ');
 		}
 
-		// Custom labels (including those with commas)
+		// Custom labels: join with a space so units are properly separated.
 		return units.map(({ unit, value }) => {
 			const label = unitLabels[unit];
 			if (typeof label === 'undefined') return '';
 
-			// For labels with built-in spaces or punctuation at the start
+			// Labels that begin with a space or punctuation already carry their
+			// own leading separator, so skip the extra space.
 			if (typeof label === 'string' && (label.startsWith(' ') || label.startsWith(','))) {
 				return `${value}${label}`;
 			}
 
-			// Handle special case for custom labels with commas - used in tests
-			if (typeof label === 'string' && label.trim().endsWith(',')) {
-				return `${value} ${label}`;
-			}
-
 			return `${value} ${label}`;
-		}).join('').trim(); // Join without spaces and trim any trailing spaces
-	}
-
-	/**
-	 * Determine if the unit labels represent a time format with colons.
-	 * Analyzes the unit label configuration to detect TIME and TIME_WITH_SECONDS
-	 * formats which require special colon-separated formatting.
-	 *
-	 * @param unitLabels - The unit labels to analyze
-	 * @returns True if this is a colon-based time format, false for standard formats
-	 * @private
-	 *
-	 * @example
-	 * ```typescript
-	 * // Internal usage - distinguishes between:
-	 * // TIME format: "1:30" (colon-separated)
-	 * // CONCISE format: "1h 30m" (space-separated with labels)
-	 * ```
-	 */
-	private static _ValidateTimeFormat(unitLabels: NonNullable<ITimeElapsedFormatOptions['unitLabels']>): boolean {
-		return Boolean(unitLabels.hour && typeof unitLabels.hour === 'function' && unitLabels.minute && typeof unitLabels.minute === 'function' && (
-			String(unitLabels.hour).includes(':') || String(unitLabels.minute).includes('padStart')
-		));
+		}).join(' ');
 	}
 
 	/**

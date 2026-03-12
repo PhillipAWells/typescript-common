@@ -14,7 +14,7 @@
  * ```
  */
 export function ArrayShuffle<T>(array: T[]): T[] {
-	if (!array) return [];
+	if (array === null || array === undefined) return [];
 
 	const result = [...array];
 

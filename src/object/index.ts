@@ -29,7 +29,7 @@ export { isPropertyKeySafe, isPropertyPathSafe, sanitizePropertyKey, filterDange
 export { ObjectInvert } from './object-invert.js';
 export { ObjectFlatten } from './object-flatten.js';
 export { ObjectDiff } from './object-diff.js';
-export { ObjectError, ObjectPropertyError, AssertObjectHasProperty, AssertObjectHasOwnProperty, AssertObjectPropertyNotNull } from './assert.js';
+export { AssertObject, ObjectError, ObjectPropertyError, AssertObjectHasProperty, AssertObjectHasOwnProperty, AssertObjectPropertyNotNull } from './assert.js';
 export type { IObjectDiffResult } from './object-diff.js';
 
 // Types

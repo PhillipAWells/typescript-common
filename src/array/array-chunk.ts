@@ -13,7 +13,7 @@
  * ```
  */
 export function ArrayChunk<T>(array: T[], size: number): T[][] {
-	if (!array || !(size > 0)) {
+	if (array === null || array === undefined || !(size > 0)) {
 		return [];
 	}
 

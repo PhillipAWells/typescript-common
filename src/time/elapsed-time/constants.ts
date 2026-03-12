@@ -1,4 +1,4 @@
-import type { IDefaultUnitLabels, IFormats } from './types';
+import type { IDefaultUnitLabels, IFormats } from './types.js';
 
 /**
  * Default unit labels for different formatting styles.

@@ -1,4 +1,4 @@
-import type { TStringValidator } from './types';
+import type { TStringValidator } from './types.js';
 
 /**
  * Checks if a string is empty or contains only whitespace.

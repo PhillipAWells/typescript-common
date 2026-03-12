@@ -15,7 +15,7 @@
  * ```
  */
 export function Unique<T>(array: T[]): T[] {
-	if (!array) {
+	if (array === null || array === undefined) {
 		return [];
 	}
 

@@ -13,6 +13,6 @@
  * ```
  */
 export function ArrayFlatten<T = unknown>(array: any[], depth?: number): T[] {
-	if (!array) return [];
+	if (array === null || array === undefined) return [];
 	return array.flat(depth ?? Infinity) as T[];
 }

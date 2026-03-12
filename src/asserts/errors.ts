@@ -51,6 +51,10 @@ export class BaseError extends Error {
 	 */
 	constructor(message: string, code: string, context?: Record<string, unknown>) {
 		super(message);
+		// Fix prototype chain so that `instanceof` works correctly when the class
+		// is transpiled (e.g. tsc targeting ES5).  Must come before reading
+		// `this.constructor.name` because that relies on the prototype being set.
+		Object.setPrototypeOf(this, new.target.prototype);
 		this.name = this.constructor.name;
 		this.Code = code;
 		this.Context = context;

@@ -1,29 +1,23 @@
 import type { IAssertException } from '../asserts/types.js';
 import { SetExceptionClass, SetExceptionMessage, ThrowException } from '../asserts/utils.js';
 import { SimpleError } from '../asserts/errors.js';
-
-/**
- * Cache for compiled regex patterns to improve performance when the same patterns are used repeatedly.
- * Maps regex source + flags to the compiled RegExp object for efficient reuse.
- *
- * @internal
- */
-const REGEX_PATTERN_CACHE = new Map<string, RegExp>();
+import { LRUCache } from '../lru-cache.js';
 
 /**
  * Maximum number of cached regex patterns to prevent unbounded memory growth.
- * When this limit is reached, the cache will be cleared to maintain memory efficiency.
+ * When this limit is reached, the least recently used entry is evicted.
  *
  * @internal
  */
 const MAX_CACHE_SIZE = 100;
 
 /**
- * Number of oldest cache entries to evict in one batch when the cache is full.
+ * LRU cache for compiled regex patterns to improve performance when the same
+ * patterns are used repeatedly. Keyed by `source:::flags`.
  *
  * @internal
  */
-const CACHE_EVICTION_BATCH_SIZE = 20;
+const REGEX_PATTERN_CACHE = new LRUCache<string, RegExp>(MAX_CACHE_SIZE);
 
 /**
  * Gets a cached regex pattern or creates and caches a new one.
@@ -36,19 +30,13 @@ const CACHE_EVICTION_BATCH_SIZE = 20;
  */
 function getCachedRegex(source: string, flags: string = ''): RegExp {
 	const cacheKey = `${source}:::${flags}`;
-	let regex = REGEX_PATTERN_CACHE.get(cacheKey);
-
-	if (!regex) {
-		// Use LRU eviction: delete oldest entries when cache reaches limit
-		if (REGEX_PATTERN_CACHE.size >= MAX_CACHE_SIZE) {
-			const keysToDelete = Array.from(REGEX_PATTERN_CACHE.keys()).slice(0, CACHE_EVICTION_BATCH_SIZE);
-			keysToDelete.forEach(key => REGEX_PATTERN_CACHE.delete(key));
-		}
-
-		regex = new RegExp(source, flags);
-		REGEX_PATTERN_CACHE.set(cacheKey, regex);
+	const cached = REGEX_PATTERN_CACHE.get(cacheKey);
+	if (cached) {
+		return cached;
 	}
 
+	const regex = new RegExp(source, flags);
+	REGEX_PATTERN_CACHE.set(cacheKey, regex);
 	return regex;
 }
 

@@ -20,7 +20,7 @@ import type { TTransform } from './types.js';
  * ```
  */
 export function ArrayGroupBy<T, K extends string | number | symbol>(array: T[], keyFn: TTransform<T, K>): Record<K, T[]> {
-	if (!array) {
+	if (array === null || array === undefined) {
 		return {} as Record<K, T[]>;
 	}
 

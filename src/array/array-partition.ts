@@ -17,7 +17,7 @@ import type { TPredicate } from './types.js';
  * ```
  */
 export function ArrayPartition<T>(array: T[], predicate: TPredicate<T>): [T[], T[]] {
-	if (!array) return [[], []];
+	if (array === null || array === undefined) return [[], []];
 
 	const matches: T[] = [];
 	const rest: T[] = [];

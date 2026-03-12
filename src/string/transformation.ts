@@ -1,4 +1,4 @@
-import type { TStringTransformer } from './types';
+import type { TStringTransformer } from './types.js';
 
 /**
  * Reverses a string.

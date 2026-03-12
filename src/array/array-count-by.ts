@@ -22,7 +22,7 @@ export function ArrayCountBy<T, K extends string | number | symbol>(
 	array: T[],
 	keyFn: TTransform<T, K>,
 ): Record<K, number> {
-	if (!array) return {} as Record<K, number>;
+	if (array === null || array === undefined) return {} as Record<K, number>;
 
 	const result = {} as Record<K, number>;
 

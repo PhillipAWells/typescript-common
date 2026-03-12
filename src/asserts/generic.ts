@@ -4,7 +4,16 @@ import { SetExceptionClass, SetExceptionMessage, ThrowException } from './utils.
 import { AssertionError, SimpleError } from './errors.js';
 
 /** Maximum number of characters to include from a value in an error message. */
-const MAX_VALUE_DISPLAY_LENGTH = 50;
+const MAX_VALUE_DISPLAY_LENGTH = 100;
+
+/** Serialises a value to a human-readable string, safe for any value type. */
+function safeDisplay(value: unknown): string {
+	try {
+		return (JSON.stringify(value) ?? String(value)).slice(0, MAX_VALUE_DISPLAY_LENGTH);
+	} catch {
+		return String(value).slice(0, MAX_VALUE_DISPLAY_LENGTH);
+	}
+}
 
 /**
  * Type alias for constructor functions.
@@ -170,7 +179,7 @@ export class ExtendsError extends SimpleError {
 export function AssertEquals<T>(value: T, expected: T, exception: IAssertException = {}): void {
 	SetExceptionClass(exception, AssertionError);
 	if (!ObjectEquals(value, expected)) {
-		SetExceptionMessage(exception, `Expected ${value} to equal ${expected}`);
+		SetExceptionMessage(exception, `Expected ${safeDisplay(value)} to equal ${safeDisplay(expected)}`);
 		ThrowException(exception);
 	}
 }
@@ -242,7 +251,7 @@ export function AssertEquals<T>(value: T, expected: T, exception: IAssertExcepti
 export function AssertNotEquals<T>(value: T, expected: T, exception: IAssertException = {}): void {
 	SetExceptionClass(exception, AssertionError);
 	if (ObjectEquals(value, expected)) {
-		SetExceptionMessage(exception, `Expected ${value} to not equal ${expected}`);
+		SetExceptionMessage(exception, `Expected ${safeDisplay(value)} to not equal ${safeDisplay(expected)}`);
 		ThrowException(exception);
 	}
 }
