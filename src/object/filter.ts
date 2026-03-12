@@ -12,6 +12,11 @@ import type { IObjectFilterOptions, TPropertyFilter } from './types.js';
  * @returns True if the values match according to deep equality rules
  */
 function objectDeepComparison(objValue: any, filterValue: any, caseInsensitiveStrings: boolean = false): boolean {
+	// Handle function as predicate
+	if (typeof filterValue === 'function') {
+		return filterValue(objValue);
+	}
+
 	// Handle string comparison with case insensitivity option
 	if (caseInsensitiveStrings && typeof objValue === 'string' && typeof filterValue === 'string') {
 		return objValue.toLowerCase() === filterValue.toLowerCase();
@@ -74,6 +79,11 @@ function objectHandleArrayComparison(objValue: any[], filterValue: any, caseInse
  * @returns True if values match according to specified criteria
  */
 function objectCompareValues(objValue: any, filterValue: any, caseInsensitiveStrings: boolean, useDeepEqual = false): boolean {
+	// Handle function as predicate
+	if (typeof filterValue === 'function') {
+		return filterValue(objValue);
+	}
+
 	// Check if objValue is an array
 	if (Array.isArray(objValue)) {
 		return objectHandleArrayComparison(objValue, filterValue, caseInsensitiveStrings, useDeepEqual);
@@ -160,6 +170,12 @@ function objectCompareValues(objValue: any, filterValue: any, caseInsensitiveStr
  * // Path validation (security)
  * ObjectFilter(profile, { '../malicious': 'value' }, { validatePaths: true }); // false
  * ObjectFilter(profile, { 'user..name': 'John' }, { validatePaths: true }); // false
+ *
+ * // Predicate functions as filter values
+ * const user = { name: 'John', age: 30, role: 'admin' };
+ * ObjectFilter(user, { age: (v) => v > 18 }); // true
+ * ObjectFilter(user, { role: (v) => v === 'admin', age: (v) => v > 25 }); // true
+ * ObjectFilter(user, { age: (v) => v < 18 }); // false
  * ```
  */
 export function ObjectFilter<T>(object: T, filter: Record<string, any>, options: IObjectFilterOptions = {}): boolean {
