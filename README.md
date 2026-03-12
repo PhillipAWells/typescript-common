@@ -39,6 +39,59 @@ NumberUtils.AssertNumber(value, { gte: 0, integer: true });
 import { ArrayChunk, ObjectPick, CamelCase, Sleep, AssertString, LRUCache } from '@pawells/typescript-common';
 ```
 
+## Features & Patterns
+
+### Readonly Array Support
+
+All array utilities accept `readonly T[]` arrays, enabling zero-copy usage with frozen constants:
+
+```typescript
+const colors = Object.freeze(['red', 'green', 'blue']); // readonly string[]
+ArrayChunk(colors, 2); // Works without casting!
+ArrayFilter(colors, c => c.length > 3); // ✓ No type errors
+```
+
+### Custom RNG for Deterministic Testing
+
+`ArraySample` and `ArrayShuffle` accept an optional custom RNG function for reproducible randomization:
+
+```typescript
+const seededRng = Mulberry32(42); // Your seeded PRNG
+ArrayShuffle([1, 2, 3], seededRng); // Same output every time
+ArraySample([1, 2, 3], 2, seededRng); // Deterministic sampling
+
+// Without RNG, defaults to Math.random() for normal usage
+ArrayShuffle([1, 2, 3]); // Random shuffle
+```
+
+### Predicate Functions in ObjectFilter
+
+Filter by predicate functions in addition to equality checks:
+
+```typescript
+const user = { name: 'John', age: 30, active: true };
+
+// Basic equality filtering
+ObjectFilter(user, { name: 'John' }); // true
+
+// Predicate functions as filter values
+ObjectFilter(user, { age: (v) => v > 18 }); // true
+ObjectFilter(user, { age: (v) => v < 18 }); // false
+
+// Mix predicates and values
+ObjectFilter(user, {
+  active: true,
+  age: (v) => v >= 21
+}); // true
+
+// Supports dot notation with predicates
+const order = { user: { age: 25 }, total: 100 };
+ObjectFilter(order, {
+  'user.age': (v) => v >= 21,
+  'total': (v) => v > 50
+}); // true
+```
+
 ## API
 
 ### Array utilities — `ArrayUtils`
@@ -50,7 +103,8 @@ import { ArrayChunk, ObjectPick, CamelCase, Sleep, AssertString, LRUCache } from
 | `ArrayFilter(array, predicate)` | Type-safe array filter |
 | `ArrayGroupBy(array, keyFn)` | Group array elements by a key function |
 | `ArrayIntersection(a, b)` | Return elements present in both arrays |
-| `ArrayShuffle(array)` | Return a shuffled copy of an array |
+| `ArrayShuffle(array, rng?)` | Return a shuffled copy of an array (optional custom RNG for deterministic results) |
+| `ArraySample(array, n?, rng?)` | Random element or `n` random elements (optional custom RNG for deterministic results) |
 | `Unique(array)` | Remove duplicate values |
 | `ArrayDifference(a, b)` | Elements in `a` not present in `b` |
 | `ArrayFlatten(array, depth?)` | Flatten a nested array to a given depth |
@@ -60,7 +114,6 @@ import { ArrayChunk, ObjectPick, CamelCase, Sleep, AssertString, LRUCache } from
 | `ArrayRange(start, end, step?)` | Generate a numeric sequence |
 | `ArraySortBy(array, keyFn, direction?)` | Immutable sort by a computed key |
 | `ArrayCountBy(array, keyFn)` | Count elements per group key |
-| `ArraySample(array, n?)` | Random element or `n` random elements |
 | `AssertArray(value, args?, exception?)` | Assert value is an array (with optional size constraints) |
 | `AssertArray2D(value, args?, exception?)` | Assert value is a rectangular 2D array |
 | `AssertArrayNotEmpty(value, exception?)` | Assert array has at least one element |
@@ -86,7 +139,7 @@ import { ArrayChunk, ObjectPick, CamelCase, Sleep, AssertString, LRUCache } from
 | `IsObject(value)` | Type-guard: returns `true` if value is a non-null, non-array object |
 | `ObjectClone(obj)` | Deep-clone an object |
 | `ObjectEquals(a, b)` | Deep equality check |
-| `ObjectFilter(obj, predicate)` | Filter object entries by predicate |
+| `ObjectFilter(obj, filter, options?)` | Filter object by property values or predicate functions (supports dot notation, deep equality, case-insensitive matching, and predicate functions) |
 | `ObjectFilterCached(obj, predicate)` | Cached filter for repeated operations |
 | `FilterObject(obj, keys)` | Keep only specified keys |
 | `ObjectPick(obj, keys)` | Pick a subset of keys |

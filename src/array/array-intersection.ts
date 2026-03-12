@@ -23,8 +23,8 @@ import type { TEqualityComparator } from './types.js';
  * @complexity O(n+m) where n and m are array lengths
  */
 export function ArrayIntersection<T>(
-	array1: T[],
-	array2: T[],
+	array1: readonly T[],
+	array2: readonly T[],
 	comparator?: TEqualityComparator<T>,
 ): T[] {
 	if (!array1 || !array2) {

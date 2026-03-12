@@ -71,7 +71,7 @@ function matchesValue(value: unknown, filterValue: unknown): boolean {
  * ArrayFilter(numbers, (n) => n > 3); // [4, 5]
  */
 export function ArrayFilter<T>(
-	array: T[],
+	array: readonly T[],
 	criteria: Partial<Record<string, unknown>> | TPredicate<T>,
 ): T[] {
 	if (array === null || array === undefined) return [];

@@ -18,7 +18,7 @@ import type { TTransform } from './types.js';
  * ```
  */
 export function ArraySortBy<T>(
-	array: T[],
+	array: readonly T[],
 	keyFn: TTransform<T, string | number>,
 	direction: 'asc' | 'desc' = 'asc',
 ): T[] {

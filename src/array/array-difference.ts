@@ -23,8 +23,8 @@ import type { TEqualityComparator } from './types.js';
  * @complexity O(n+m) for primitive values, O(n*m) when a comparator is provided
  */
 export function ArrayDifference<T>(
-	array1: T[],
-	array2: T[],
+	array1: readonly T[],
+	array2: readonly T[],
 	comparator?: TEqualityComparator<T>,
 ): T[] {
 	if (!array1) return [];

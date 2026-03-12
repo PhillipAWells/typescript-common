@@ -12,7 +12,7 @@
  * ArrayChunk(['a', 'b', 'c'], 2); // [['a', 'b'], ['c']]
  * ```
  */
-export function ArrayChunk<T>(array: T[], size: number): T[][] {
+export function ArrayChunk<T>(array: readonly T[], size: number): T[][] {
 	if (array === null || array === undefined || !(size > 0)) {
 		return [];
 	}

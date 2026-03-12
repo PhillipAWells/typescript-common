@@ -19,7 +19,7 @@ import type { TTransform } from './types.js';
  * ```
  */
 export function ArrayCountBy<T, K extends string | number | symbol>(
-	array: T[],
+	array: readonly T[],
 	keyFn: TTransform<T, K>,
 ): Record<K, number> {
 	if (array === null || array === undefined) return {} as Record<K, number>;

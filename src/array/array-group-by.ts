@@ -19,7 +19,7 @@ import type { TTransform } from './types.js';
  * // { 3: ['one', 'two'], 5: ['three'] }
  * ```
  */
-export function ArrayGroupBy<T, K extends string | number | symbol>(array: T[], keyFn: TTransform<T, K>): Record<K, T[]> {
+export function ArrayGroupBy<T, K extends string | number | symbol>(array: readonly T[], keyFn: TTransform<T, K>): Record<K, T[]> {
 	if (array === null || array === undefined) {
 		return {} as Record<K, T[]>;
 	}

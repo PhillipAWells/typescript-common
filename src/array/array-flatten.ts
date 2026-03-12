@@ -12,7 +12,7 @@
  * ArrayFlatten([1, [2, [3]]], 1);   // [1, 2, [3]]
  * ```
  */
-export function ArrayFlatten<T = unknown>(array: any[], depth?: number): T[] {
+export function ArrayFlatten<T = unknown>(array: readonly any[], depth?: number): T[] {
 	if (array === null || array === undefined) return [];
 	return array.flat(depth ?? Infinity) as T[];
 }
