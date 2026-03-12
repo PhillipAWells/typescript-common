@@ -55,7 +55,7 @@ export class ObjectPropertyError extends SimpleError {
  */
 export function AssertObject(value: unknown, exception: IAssertException = {}): asserts value is Record<string, unknown> {
 	SetExceptionClass(exception, ObjectError);
-	if (typeof value !== 'object' || value === null || Array.isArray(value) || typeof value === 'function') {
+	if (typeof value !== 'object' || value === null || Array.isArray(value)) {
 		const actualType = value === null ? 'null' : Array.isArray(value) ? 'array' : typeof value;
 		let valueStr: string;
 
