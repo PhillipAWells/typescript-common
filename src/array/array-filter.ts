@@ -74,7 +74,7 @@ export function ArrayFilter<T>(
 	array: T[],
 	criteria: Partial<Record<string, unknown>> | TPredicate<T>,
 ): T[] {
-	if (!array) return [];
+	if (array === null || array === undefined) return [];
 
 	// If criteria is a function, use it as predicate
 	if (typeof criteria === 'function') {

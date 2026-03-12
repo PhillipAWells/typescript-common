@@ -22,7 +22,7 @@ export function ArraySortBy<T>(
 	keyFn: TTransform<T, string | number>,
 	direction: 'asc' | 'desc' = 'asc',
 ): T[] {
-	if (!array) return [];
+	if (array === null || array === undefined) return [];
 
 	return [...array].sort((a, b) => {
 		const keyA = keyFn(a);
